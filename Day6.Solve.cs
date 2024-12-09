@@ -1,37 +1,53 @@
 ﻿namespace AdventOfCode;
 
-public partial record Day6(string Input) : AdventDay(Input)
+public partial record Day6 : AdventDay
 {
 
-    public override void SolvePart1()
+    private readonly GridFlag[][] _grid;
+
+    private readonly Guard _guard;
+
+    public Day6(string input) : base(input)
     {
-        var grid = Input.Split('\n')
+        _grid = input.Split('\n')
             .Where(line => !string.IsNullOrWhiteSpace(line))
-            .Select(line => line
+                .Select(line => line
                 .Select(static gridElement => ParseGridFlags(gridElement))
                 .ToArray())
             .ToArray();
 
-        var guard = new Guard(grid);
-        int count = 1;
+        _guard = new(_grid);
+    }
 
-        while (guard.Move() && !guard.WasInCurrentSituationBefore())
-        {
-            if (!guard.VisitedCurrentPositionAlready())
-            {
-                count++;
-            }
-
-            guard.UpdateFlagsForCurrentPosition();
-        }
-
-        Console.WriteLine(count);
+    public override void SolvePart1()
+    {
+        Console.WriteLine(_guard.PatrolAndCountUniquePositions());
+        _guard.Reset();
     }
 
     public override void SolvePart2()
     {
+        int possibleObstaclePlacementCount = 0;
 
+        for (int j = 0; j < _grid.Length; j++)
+        {
+            for (int i = 0; i < _grid[j].Length; i++)
+            {
+                if (_grid[j][i] == GridFlag.Empty)
+                {
+                    _guard.Grid[j][i] = GridFlag.Obstacle;
+
+                    if (_guard.PatrolAndCountUniquePositions() == null)
+                    {
+                        possibleObstaclePlacementCount++;
+                    }
+
+                    _guard.Reset();
+                }
+            }
+        }
+
+        Console.WriteLine(possibleObstaclePlacementCount);
     }
-
 
 }
