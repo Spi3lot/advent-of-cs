@@ -2,17 +2,17 @@
 
 namespace AdventOfCode;
 
-public record Day3(string Input) : AdventDay(Input)
+public record Day3 : AdventDay<Day3>
 {
 
     public override void SolvePart1()
     {
         ulong sum = 0;
 
-        foreach (Match match in Regex.Matches(Input, @"(?:mul\((\d{1,3}),(\d{1,3})\))"))
+        foreach (var group in Regex.Matches(Input, @"(?:mul\((\d{1,3}),(\d{1,3})\))").Select(match => match.Groups))
         {
-            var factor1 = ulong.Parse(match.Groups[1].Value);
-            var factor2 = ulong.Parse(match.Groups[2].Value);
+            ulong factor1 = ulong.Parse(group[1].Value);
+            ulong factor2 = ulong.Parse(group[2].Value);
             sum += factor1 * factor2;
         }
 
@@ -24,19 +24,17 @@ public record Day3(string Input) : AdventDay(Input)
         bool multiply = true;
         ulong sum = 0;
 
-        foreach (Match match in Regex.Matches(Input, @"do(?:n't)?\(\)|mul\(\d{1,3},\d{1,3}\)"))
+        foreach (string value in Regex.Matches(Input, @"do(?:n't)?\(\)|mul\(\d{1,3},\d{1,3}\)")
+                     .Select(match => match.Value))
         {
-            string value = match.Value;
-
             if (value.StartsWith("mul"))
             {
-                if (multiply)
-                {
-                    var numbers = Regex.Match(value, @"(\d+),(\d+)");
-                    var factor1 = ulong.Parse(numbers.Groups[1].Value);
-                    var factor2 = ulong.Parse(numbers.Groups[2].Value);
-                    sum += factor1 * factor2;
-                }
+                if (!multiply) continue;
+
+                var numbers = Regex.Match(value, @"(\d+),(\d+)");
+                ulong factor1 = ulong.Parse(numbers.Groups[1].Value);
+                ulong factor2 = ulong.Parse(numbers.Groups[2].Value);
+                sum += factor1 * factor2;
             }
             else
             {
@@ -44,7 +42,7 @@ public record Day3(string Input) : AdventDay(Input)
                 {
                     "do()" => true,
                     "don't()" => false,
-                    _ => throw new InvalidOperationException(value),
+                    _ => throw new InvalidOperationException(value)
                 };
             }
         }

@@ -1,21 +1,17 @@
-﻿
-namespace AdventOfCode;
+﻿namespace AdventOfCode;
 
 public partial record Day6
 {
 
-    private class Guard
+    private sealed class Guard
     {
 
-        private readonly GridFlag[][] _originalGrid;
-        private readonly (int x, int y) _originalPosition;
         private readonly (int x, int y) _originalDirection;
 
-        public GridFlag[][] Grid { get; private set; }
-        public (int x, int y) Position { get; private set; }
-        public (int x, int y) Direction { get; private set; }
+        private readonly GridElements[][] _originalGrid;
+        private readonly (int x, int y) _originalPosition;
 
-        public Guard(GridFlag[][] grid)
+        public Guard(GridElements[][] grid)
         {
             _originalGrid = grid;
             bool foundGuard = false;
@@ -28,7 +24,7 @@ public partial record Day6
                 {
                     var flags = grid[j][i];
 
-                    if (flags.HasFlag(GridFlag.Visited))
+                    if (flags.HasFlag(Day6.GridElements.Visited))
                     {
                         _originalPosition = (i, j);
                         _originalDirection = GetDirectionFromFlag(flags);
@@ -40,6 +36,12 @@ public partial record Day6
 
             Reset();
         }
+
+        public GridElements[][] Grid { get; private set; }
+
+        public (int x, int y) Position { get; private set; }
+
+        public (int x, int y) Direction { get; private set; }
 
         public void Reset()
         {
@@ -57,15 +59,9 @@ public partial record Day6
 
             while (Move())
             {
-                if (WasInCurrentSituationBefore())
-                {
-                    return null;
-                }
+                if (WasInCurrentSituationBefore()) return null;
 
-                if (!VisitedCurrentPositionAlready())
-                {
-                    count++;
-                }
+                if (!VisitedCurrentPositionAlready()) count++;
 
                 UpdateFlagsForCurrentPosition();
             }
@@ -75,7 +71,7 @@ public partial record Day6
 
         private bool VisitedCurrentPositionAlready()
         {
-            return Grid[Position.y][Position.x].HasFlag(GridFlag.Visited);
+            return Grid[Position.y][Position.x].HasFlag(Day6.GridElements.Visited);
         }
 
         private bool WasInCurrentSituationBefore()
@@ -89,12 +85,9 @@ public partial record Day6
             movedPosition.x += Direction.x;
             movedPosition.y += Direction.y;
 
-            if (!IsOnGrid(movedPosition))
-            {
-                return false;
-            }
+            if (!IsOnGrid(movedPosition)) return false;
 
-            if (Grid[movedPosition.y][movedPosition.x].HasFlag(GridFlag.Obstacle))
+            if (Grid[movedPosition.y][movedPosition.x].HasFlag(Day6.GridElements.Obstacle))
             {
                 RotateClockwise();
             }
@@ -108,13 +101,14 @@ public partial record Day6
 
         private void UpdateFlagsForCurrentPosition()
         {
-            Grid[Position.y][Position.x] |= GridFlag.Visited;
+            Grid[Position.y][Position.x] |= Day6.GridElements.Visited;
             Grid[Position.y][Position.x] |= GetFlagFromDirection(Direction);
         }
 
         private bool IsOnGrid((int x, int y) position)
         {
-            return position.y >= 0 && position.y < Grid.Length && position.x >= 0 && position.x < Grid[position.y].Length;
+            return position.y >= 0 && position.y < Grid.Length && position.x >= 0 &&
+                   position.x < Grid[position.y].Length;
         }
 
         private void RotateClockwise()

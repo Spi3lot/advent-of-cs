@@ -1,9 +1,9 @@
 ﻿namespace AdventOfCode;
 
-public partial record Day6 : AdventDay
+public partial record Day6 : AdventDay<Day6>
 {
 
-    private readonly GridFlag[][] _grid;
+    private readonly GridElements[][] _grid;
 
     private readonly Guard _guard;
 
@@ -11,12 +11,12 @@ public partial record Day6 : AdventDay
     {
         _grid = input.Split('\n')
             .Where(line => !string.IsNullOrWhiteSpace(line))
-                .Select(line => line
+            .Select(line => line
                 .Select(static gridElement => ParseGridFlags(gridElement))
                 .ToArray())
             .ToArray();
 
-        _guard = new(_grid);
+        _guard = new Guard(_grid);
     }
 
     public override void SolvePart1()
@@ -33,17 +33,16 @@ public partial record Day6 : AdventDay
         {
             for (int i = 0; i < _grid[j].Length; i++)
             {
-                if (_grid[j][i] == GridFlag.Empty)
+                if (_grid[j][i] != GridElements.None) continue;
+                
+                _guard.Grid[j][i] = GridElements.Obstacle;
+
+                if (_guard.PatrolAndCountUniquePositions() == null)
                 {
-                    _guard.Grid[j][i] = GridFlag.Obstacle;
-
-                    if (_guard.PatrolAndCountUniquePositions() == null)
-                    {
-                        possibleObstaclePlacementCount++;
-                    }
-
-                    _guard.Reset();
+                    possibleObstaclePlacementCount++;
                 }
+
+                _guard.Reset();
             }
         }
 

@@ -7,11 +7,11 @@ public static class Launcher
 
     public static void Main()
     {
-        var day = new Day7(File.ReadAllText("day7/input.txt"));
+        var day = new Day8();
         SolvePartsAndPrintElapsedTimes(day);
     }
 
-    private static void SolvePartsAndPrintElapsedTimes(AdventDay day)
+    private static void SolvePartsAndPrintElapsedTimes<T>(AdventDay<T> day) where T : AdventDay<T>
     {
         var stopWatch = Stopwatch.StartNew();
         day.SolvePart1();

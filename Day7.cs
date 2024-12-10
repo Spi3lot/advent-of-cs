@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode;
 
-public partial record Day7(string Input) : AdventDay(Input)
+public partial record Day7 : AdventDay<Day7>
 {
 
     public override void SolvePart1()
@@ -9,7 +9,7 @@ public partial record Day7(string Input) : AdventDay(Input)
             .Where(static line => !string.IsNullOrEmpty(line))
             .Select(Equation.Parse)
             .Where(static equation => equation.IsSolvable(2))
-            .Select(static equation => (long)equation.Numbers[0])
+            .Select(static equation => (long) equation.Numbers[0])
             .Sum();
 
         Console.WriteLine(totalCalibrationResult);
@@ -21,7 +21,7 @@ public partial record Day7(string Input) : AdventDay(Input)
             .Where(static line => !string.IsNullOrEmpty(line))
             .Select(Equation.Parse)
             .Where(static equation => equation.IsSolvable(3))
-            .Select(static equation => (long)equation.Numbers[0])
+            .Select(static equation => (long) equation.Numbers[0])
             .Sum();
 
         Console.WriteLine(totalCalibrationResult);

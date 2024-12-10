@@ -1,11 +1,11 @@
 ﻿namespace AdventOfCode;
 
-public record Day5(string Input) : AdventDay(Input)
+public record Day5 : AdventDay<Day5>
 {
 
     public override void SolvePart1()
     {
-        var split = Input.Split("\n\n");
+        string[] split = Input.Split("\n\n");
 
         Page.Rules = split[0].Split('\n')
             .Select(ruleString => ruleString.Split('|'))
@@ -29,7 +29,7 @@ public record Day5(string Input) : AdventDay(Input)
 
     public override void SolvePart2()
     {
-        var split = Input.Split("\n\n");
+        string[]? split = Input.Split("\n\n");
 
         Page.Rules = split[0].Split('\n')
             .Select(ruleString => ruleString.Split('|'))
@@ -53,42 +53,30 @@ public record Day5(string Input) : AdventDay(Input)
         Console.WriteLine(sum);
     }
 
-    private record Page(int Number) : IComparable<Page>
+    private sealed record Page(int Number) : IComparable<Page>
     {
 
         // Each key precedes all the corresponding values
-        public static ILookup<int, int>? Rules;  // ILookup = "multi-valued Dictionary"
+        public static ILookup<int, int>? Rules; // ILookup = "multi-valued Dictionary"
 
         public int CompareTo(Page? other)
         {
-            if (other == this)
-            {
-                return 0;
-            }
+            if (other == this) return 0;
 
-            if (other == null)
-            {
-                throw new InvalidOperationException($"{nameof(other)} shall not be null");
-            }
+            if (other == null) throw new InvalidOperationException($"{nameof(other)} shall not be null");
 
             if (Rules == null)
             {
-                throw new InvalidOperationException($"{nameof(Rules)} shall not be null"); ;
+                throw new InvalidOperationException($"{nameof(Rules)} shall not be null");
             }
 
             // this is a predecessor of other
             // other is a successor of this
-            if (Rules.Contains(Number) && Rules[Number].Contains(other.Number))
-            {
-                return -1;
-            }
+            if (Rules.Contains(Number) && Rules[Number].Contains(other.Number)) return -1;
 
             // this is a successor of other
             // other is a predecessor of this
-            if (Rules.Contains(other.Number) && Rules[other.Number].Contains(Number))
-            {
-                return 1;
-            }
+            if (Rules.Contains(other.Number) && Rules[other.Number].Contains(Number)) return 1;
 
             // Neither apply
             return 0;
