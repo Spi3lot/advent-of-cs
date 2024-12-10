@@ -5,16 +5,26 @@ public partial record Day7(string Input) : AdventDay(Input)
 
     public override void SolvePart1()
     {
-        var equations = Input.Split('\n')
+        long totalCalibrationResult = Input.Split('\n')
+            .Where(static line => !string.IsNullOrEmpty(line))
             .Select(Equation.Parse)
-            .ToArray();
+            .Where(static equation => equation.IsSolvable(2))
+            .Select(static equation => (long)equation.Numbers[0])
+            .Sum();
 
-        Console.WriteLine(equations.Count(equation => equation.IsSolvable());
+        Console.WriteLine(totalCalibrationResult);
     }
 
     public override void SolvePart2()
     {
+        long totalCalibrationResult = Input.Split('\n')
+            .Where(static line => !string.IsNullOrEmpty(line))
+            .Select(Equation.Parse)
+            .Where(static equation => equation.IsSolvable(3))
+            .Select(static equation => (long)equation.Numbers[0])
+            .Sum();
 
+        Console.WriteLine(totalCalibrationResult);
     }
 
 }
