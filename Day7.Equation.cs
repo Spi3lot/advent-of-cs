@@ -49,7 +49,7 @@ public partial record Day7
                     0 => result + number,
                     1 => result * number,
                     2 => result * IPow(10, 1 + (int)Math.Log10(number)) + number,
-                    _ => throw new Exception("This is not even possible")
+                    _ => throw new Exception($"{nameof(operatorCount)} can only be 1, 2 or 3, not {operatorCount}")
                 };
 
             }
