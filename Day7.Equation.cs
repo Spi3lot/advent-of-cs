@@ -44,14 +44,14 @@ public partial record Day7
             {
                 ulong number = Numbers[i + 2];
 
-                int @operator = (int) (operatorTrits / Pow(operatorCount, i)) %
+                int @operator = (int)(operatorTrits / Pow(operatorCount, i)) %
                                 operatorCount; // Cast to int cuts off the upper 32 bits, just like necessary here
 
                 result = @operator switch
                 {
                     0 => result + number,
                     1 => result * number,
-                    2 => result * Pow(10, 1 + (int) Math.Log10(number)) + number,
+                    2 => result * Pow(10, 1 + (int)Math.Log10(number)) + number,
                     _ => throw new ConstraintException(
                         $"{nameof(operatorCount)} can only be 1, 2 or 3, not {operatorCount}"
                     )

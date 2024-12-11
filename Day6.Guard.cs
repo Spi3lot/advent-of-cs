@@ -8,10 +8,10 @@ public partial record Day6
 
         private readonly (int x, int y) _originalDirection;
 
-        private readonly GridElements[][] _originalGrid;
+        private readonly CellConditions[][] _originalGrid;
         private readonly (int x, int y) _originalPosition;
 
-        public Guard(GridElements[][] grid)
+        public Guard(CellConditions[][] grid)
         {
             _originalGrid = grid;
             bool foundGuard = false;
@@ -24,7 +24,7 @@ public partial record Day6
                 {
                     var flags = grid[j][i];
 
-                    if (flags.HasFlag(Day6.GridElements.Visited))
+                    if (flags.HasFlag(Day6.CellConditions.Visited))
                     {
                         _originalPosition = (i, j);
                         _originalDirection = GetDirectionFromFlag(flags);
@@ -37,7 +37,7 @@ public partial record Day6
             Reset();
         }
 
-        public GridElements[][] Grid { get; private set; }
+        public CellConditions[][] Grid { get; private set; }
 
         public (int x, int y) Position { get; private set; }
 
@@ -71,7 +71,7 @@ public partial record Day6
 
         private bool VisitedCurrentPositionAlready()
         {
-            return Grid[Position.y][Position.x].HasFlag(Day6.GridElements.Visited);
+            return Grid[Position.y][Position.x].HasFlag(Day6.CellConditions.Visited);
         }
 
         private bool WasInCurrentSituationBefore()
@@ -87,7 +87,7 @@ public partial record Day6
 
             if (!IsOnGrid(movedPosition)) return false;
 
-            if (Grid[movedPosition.y][movedPosition.x].HasFlag(Day6.GridElements.Obstacle))
+            if (Grid[movedPosition.y][movedPosition.x].HasFlag(Day6.CellConditions.Obstacle))
             {
                 RotateClockwise();
             }
@@ -101,7 +101,7 @@ public partial record Day6
 
         private void UpdateFlagsForCurrentPosition()
         {
-            Grid[Position.y][Position.x] |= Day6.GridElements.Visited;
+            Grid[Position.y][Position.x] |= Day6.CellConditions.Visited;
             Grid[Position.y][Position.x] |= GetFlagFromDirection(Direction);
         }
 

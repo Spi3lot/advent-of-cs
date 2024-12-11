@@ -3,7 +3,7 @@
 public partial record Day6 : AdventDay<Day6>
 {
 
-    private readonly GridElements[][] _grid;
+    private readonly CellConditions[][] _grid;
 
     private readonly Guard _guard;
 
@@ -33,9 +33,9 @@ public partial record Day6 : AdventDay<Day6>
         {
             for (int i = 0; i < _grid[j].Length; i++)
             {
-                if (_grid[j][i] != GridElements.None) continue;
-                
-                _guard.Grid[j][i] = GridElements.Obstacle;
+                if (_grid[j][i] != CellConditions.None) continue;
+
+                _guard.Grid[j][i] = CellConditions.Obstacle;
 
                 if (_guard.PatrolAndCountUniquePositions() == null)
                 {
