@@ -65,7 +65,7 @@ public record Day8 : AdventDay<Day8>
             var antinodePosition2 = antennaPositions.Item2 + difference * i;
             var gridContains = (GridContains(antinodePosition1), GridContains(antinodePosition2));
 
-            if (!gridContains.Item1 && !gridContains.Item2) break;
+            if (gridContains is (false, false)) break;
             if (gridContains.Item1) containedAntinodes.Add(antinodePosition1);
             if (gridContains.Item2) containedAntinodes.Add(antinodePosition2);
         }
