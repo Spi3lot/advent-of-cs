@@ -62,23 +62,10 @@ public record Day5 : AdventDay<Day5>
         public int CompareTo(Page? other)
         {
             if (other == this) return 0;
-
             if (other == null) throw new InvalidOperationException($"{nameof(other)} shall not be null");
-
-            if (Rules == null)
-            {
-                throw new InvalidOperationException($"{nameof(Rules)} shall not be null");
-            }
-
-            // this is a predecessor of other
-            // other is a successor of this
-            if (Rules.Contains(Number) && Rules[Number].Contains(other.Number)) return -1;
-
-            // this is a successor of other
-            // other is a predecessor of this
-            if (Rules.Contains(other.Number) && Rules[other.Number].Contains(Number)) return 1;
-
-            // Neither apply
+            if (Rules == null) throw new InvalidOperationException($"{nameof(Rules)} shall not be null");
+            if (Rules.Contains(Number) && Rules[Number].Contains(other.Number)) return -1;  // this is a predecessor of other, other is a successor of this
+            if (Rules.Contains(other.Number) && Rules[other.Number].Contains(Number)) return 1; // this is a successor of other, other is a predecessor of this
             return 0;
         }
 
