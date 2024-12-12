@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode;
+﻿using Console = System.Console;
+
+namespace AdventOfCode;
 
 public partial record Day9
 {
@@ -33,12 +35,18 @@ public partial record Day9
             return disk;
         }
 
+        public void MergeFragments()
+        {
+            RecalculateBlocks();
+            RecalculateFragments();
+        }
+
         public void RecalculateFragments()
         {
             _fragments.Clear();
             Fragment? currentFragment = null;
 
-            foreach (var block in _blocks)
+            foreach (int? block in _blocks)
             {
                 if (currentFragment == null || currentFragment.FileId != block)
                 {
@@ -50,12 +58,6 @@ public partial record Day9
                     currentFragment.Length++;
                 }
             }
-        }
-
-        public void MergeFragments()
-        {
-            RecalculateBlocks();
-            RecalculateFragments();
         }
 
         public void RecalculateBlocks()
@@ -80,7 +82,10 @@ public partial record Day9
             {
                 while (_blocks[i] != null) i++;
                 while (_blocks[j] == null) j--;
-                if (i > j) break;  // At this place, i and j can never be equal so > is sufficient. If i or j were out of bounds, an exception would have been thrown already
+
+                if (i > j)
+                    break; // At this place, i and j can never be equal so > is sufficient. If i or j were out of bounds, an exception would have been thrown already
+
                 _blocks[i] = _blocks[j];
                 _blocks[j] = null;
             }
@@ -88,29 +93,31 @@ public partial record Day9
 
         public void SqueezeFiles()
         {
-            int? movingFileIndex = LastIndexOfFileId(_fragments.Count - 1);
-
-            while (movingFileIndex != null)
+            for (int? movingFileIndex = LastIndexOfFile(_fragments.Count - 1);
+                 movingFileIndex != null;
+                 movingFileIndex = LastIndexOfFile(movingFileIndex.Value - 1))
             {
                 var movingFile = _fragments[movingFileIndex.Value];
                 int? freeSpaceIndex = IndexOfLeftmostFreeSpaceFitting(movingFile.Length);
-                if (freeSpaceIndex == null) continue;
+                if (freeSpaceIndex == null || freeSpaceIndex > movingFileIndex) continue;
                 var freeSpace = _fragments[freeSpaceIndex.Value];
-                freeSpace.FileId = movingFile.FileId;
 
                 if (freeSpace.Length > movingFile.Length)
                 {
                     freeSpace.Length -= movingFile.Length;
-                    _fragments.Insert(freeSpaceIndex.Value, (Fragment)movingFile.Clone());
+                    _fragments.Insert(freeSpaceIndex.Value, (Fragment) movingFile.Clone());
                     movingFileIndex++;
+                }
+                else // ==
+                {
+                    freeSpace.FileId = movingFile.FileId;
                 }
 
                 movingFile.FileId = null;
-                movingFileIndex = LastIndexOfFileId(movingFileIndex.Value);
             }
         }
 
-        private int? LastIndexOfFileId(int startIndex)
+        private int? LastIndexOfFile(int startIndex)
         {
             for (int i = startIndex; i >= 0; i--)
             {
@@ -140,7 +147,7 @@ public partial record Day9
             {
                 int? block = _blocks[i];
                 if (block == null) continue;
-                checksum += (ulong)(block * i);
+                checksum += (ulong) (block * i);
             }
 
             return checksum;
@@ -154,10 +161,9 @@ public partial record Day9
 
             foreach (var fragment in _fragments)
             {
-                if (fragment.FileId == null) continue;
-                position += (ulong)fragment.Length;
+                position += (ulong) fragment.Length;
                 ulong sum = CalcSumUpToExcl(position);
-                checksum += (ulong)fragment.FileId * (sum - previousSum);
+                if (fragment.FileId != null) checksum += (ulong) fragment.FileId * (sum - previousSum);
                 previousSum = sum;
             }
 
@@ -171,7 +177,10 @@ public partial record Day9
 
         public override string ToString()
         {
-            string[] strings = _blocks.Select(block => (block == null) ? "." : ((block > 9) ? $"({block})" : $"{block}")).ToArray();
+            string[] strings = _blocks
+                .Select(block => (block == null) ? "." : ((block > 9) ? $"({block})" : $"{block}"))
+                .ToArray();
+
             return string.Join("", strings);
         }
 

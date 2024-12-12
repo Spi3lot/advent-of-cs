@@ -1,4 +1,5 @@
 ﻿namespace AdventOfCode;
+
 public partial record Day9
 {
 
@@ -13,6 +14,7 @@ public partial record Day9
         {
             return new Fragment(FileId, Length);
         }
+
     }
 
 }
