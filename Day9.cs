@@ -4,13 +4,14 @@ public partial record Day9 : AdventDay<Day9>
     public override void SolvePart1()
     {
         var disk = Disk.FromMap(Input);
-        disk.Defragment();
-        Console.WriteLine(disk.CalculateChecksum());
+        disk.FragmentBlocks();
+        disk.RecalculateFragments();
+        Console.WriteLine(disk.CalculateChecksumFast());
     }
 
     public override void SolvePart2()
     {
-
+        var disk = Disk.FromMap(Input);
     }
 
 }
