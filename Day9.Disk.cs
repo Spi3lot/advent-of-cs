@@ -18,7 +18,11 @@ public partial record Day9
             {
                 int? fileId = (i % 2 == 0) ? i / 2 : null;
                 int length = map[i] - '0';
-                disk._fragments.Add(new Fragment(fileId, length));
+
+                if (length > 0)
+                {
+                    disk._fragments.Add(new Fragment(fileId, length));
+                }
 
                 for (int j = 0; j < length; j++)
                 {
@@ -48,6 +52,12 @@ public partial record Day9
             }
         }
 
+        public void MergeFragments()
+        {
+            RecalculateBlocks();
+            RecalculateFragments();
+        }
+
         public void RecalculateBlocks()
         {
             _blocks.Clear();
@@ -74,12 +84,52 @@ public partial record Day9
                 _blocks[i] = _blocks[j];
                 _blocks[j] = null;
             }
-
         }
 
-        public void Defragment()
+        public void SqueezeFiles()
         {
-            RecalculateFragments();
+            int? movingFileIndex = LastIndexOfFileId(_fragments.Count - 1);
+
+            while (movingFileIndex != null)
+            {
+                var movingFile = _fragments[movingFileIndex.Value];
+                int? freeSpaceIndex = IndexOfLeftmostFreeSpaceFitting(movingFile.Length);
+                if (freeSpaceIndex == null) continue;
+                var freeSpace = _fragments[freeSpaceIndex.Value];
+                freeSpace.FileId = movingFile.FileId;
+
+                if (freeSpace.Length > movingFile.Length)
+                {
+                    freeSpace.Length -= movingFile.Length;
+                    _fragments.Insert(freeSpaceIndex.Value, (Fragment)movingFile.Clone());
+                    movingFileIndex++;
+                }
+
+                movingFile.FileId = null;
+                movingFileIndex = LastIndexOfFileId(movingFileIndex.Value);
+            }
+        }
+
+        private int? LastIndexOfFileId(int startIndex)
+        {
+            for (int i = startIndex; i >= 0; i--)
+            {
+                var fragment = _fragments[i];
+                if (fragment.FileId != null) return i;
+            }
+
+            return null;
+        }
+
+        private int? IndexOfLeftmostFreeSpaceFitting(int length)
+        {
+            for (int i = 0; i < _fragments.Count; i++)
+            {
+                var fragment = _fragments[i];
+                if (fragment.FileId == null && fragment.Length >= length) return i;
+            }
+
+            return null;
         }
 
         public ulong CalculateChecksum()
@@ -121,8 +171,8 @@ public partial record Day9
 
         public override string ToString()
         {
-            char[] chars = _blocks.Select(block => (block == null) ? '.' : $"{block}"[0]).ToArray();
-            return new string(chars);
+            string[] strings = _blocks.Select(block => (block == null) ? "." : ((block > 9) ? $"({block})" : $"{block}")).ToArray();
+            return string.Join("", strings);
         }
 
     }
