@@ -6,7 +6,7 @@ namespace AdventOfCode;
 public partial record Day7
 {
 
-    private sealed record Equation(params ulong[] Numbers)
+    public sealed record Equation(params ulong[] Numbers)
     {
 
         private readonly int _operatorGapCount = Numbers.Length - 2;
@@ -61,7 +61,7 @@ public partial record Day7
             return result;
         }
 
-        private static ulong Pow(int @base, int exponent)
+        public static ulong Pow(int @base, int exponent)
         {
             return Convert.ToUInt64(Math.Pow(@base, exponent));
         }
