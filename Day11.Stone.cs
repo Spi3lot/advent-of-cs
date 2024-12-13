@@ -6,12 +6,24 @@ public partial record Day11 : AdventDay<Day11>
     private sealed class Stone(ulong number)
     {
 
+        public ulong Number => number;
+
         public Stone? ApplyRule()
         {
             if (number == 0) number = 1;
             else if (CountDigits(number) % 2 == 0) { (number, ulong RightHalf) = SplitNumber(number); return new Stone(RightHalf); }
             else number *= 2024;
             return null;
+        }
+
+        public ulong CountDescendants(int blinkCount)
+        {
+            if (blinkCount == 0) return 1;
+            var leftStone = new Stone(number);
+            var halfStone = leftStone.ApplyRule();
+            ulong descendantCount = 0;
+            if (halfStone != null) descendantCount += halfStone.CountDescendants(blinkCount - 1);
+            return descendantCount + leftStone.CountDescendants(blinkCount - 1);
         }
 
     }

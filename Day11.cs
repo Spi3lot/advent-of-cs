@@ -14,6 +14,7 @@ public partial record Day11 : AdventDay<Day11>
 
     public override void SolvePart1()
     {
+        // Iterative
         for (int i = 0; i < 25; i++)
         {
             foreach (var stone in (ICollection<Stone>)[.. _stones])
@@ -24,20 +25,21 @@ public partial record Day11 : AdventDay<Day11>
         }
 
         Console.WriteLine(_stones.Count);
+
+        // Recursive
+        ulong descendantCount = 0;
+
+        foreach (var item in _stones)
+        {
+            descendantCount += item.CountDescendants(25);
+        }
+
+        Console.WriteLine(descendantCount);
     }
 
     public override void SolvePart2()
     {
-        for (int i = 0; i < 75; i++)
-        {
-            foreach (var stone in (ICollection<Stone>)[.. _stones])
-            {
-                var halfStone = stone.ApplyRule();
-                if (halfStone != null) _stones.Add(halfStone);
-            }
-        }
 
-        Console.WriteLine(_stones.Count);
     }
 
 }
