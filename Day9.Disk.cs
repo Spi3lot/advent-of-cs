@@ -1,6 +1,4 @@
-﻿using Console = System.Console;
-
-namespace AdventOfCode;
+﻿namespace AdventOfCode;
 
 public partial record Day9
 {
@@ -105,7 +103,7 @@ public partial record Day9
                 if (freeSpace.Length > movingFile.Length)
                 {
                     freeSpace.Length -= movingFile.Length;
-                    _fragments.Insert(freeSpaceIndex.Value, (Fragment) movingFile.Clone());
+                    _fragments.Insert(freeSpaceIndex.Value, (Fragment)movingFile.Clone());
                     movingFileIndex++;
                 }
                 else // ==
@@ -147,7 +145,7 @@ public partial record Day9
             {
                 int? block = _blocks[i];
                 if (block == null) continue;
-                checksum += (ulong) (block * i);
+                checksum += (ulong)(block * i);
             }
 
             return checksum;
@@ -161,9 +159,9 @@ public partial record Day9
 
             foreach (var fragment in _fragments)
             {
-                position += (ulong) fragment.Length;
+                position += (ulong)fragment.Length;
                 ulong sum = CalcSumUpToExcl(position);
-                if (fragment.FileId != null) checksum += (ulong) fragment.FileId * (sum - previousSum);
+                if (fragment.FileId != null) checksum += (ulong)fragment.FileId * (sum - previousSum);
                 previousSum = sum;
             }
 
