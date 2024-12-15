@@ -12,34 +12,35 @@ public partial record Day11 : AdventDay<Day11>
             .ToList();
     }
 
+    // Iterative
     public override void SolvePart1()
     {
-        // Iterative
+        var stones = _stones.Select(stone => new Stone(stone.Number)).ToList();
+
         for (int i = 0; i < 25; i++)
         {
-            foreach (var stone in (ICollection<Stone>)[.. _stones])
+            foreach (var stone in (ICollection<Stone>) [.. stones])
             {
                 var halfStone = stone.ApplyRule();
-                if (halfStone != null) _stones.Add(halfStone);
+                if (halfStone != null) stones.Add(halfStone);
             }
         }
 
-        Console.WriteLine(_stones.Count);
-
-        // Recursive
-        ulong descendantCount = 0;
-
-        foreach (var item in _stones)
-        {
-            descendantCount += item.CountDescendants(25);
-        }
-
-        Console.WriteLine(descendantCount);
+        Console.WriteLine(stones.Count);
     }
 
+    // Recursive
     public override void SolvePart2()
     {
+        var cache = new Dictionary<(ulong, int), ulong>();
 
+        checked
+        {
+            ulong total = _stones.Aggregate<Stone, ulong>(0,
+                (current, stone) => current + stone.CountDescendants(75, cache));
+
+            Console.WriteLine(total);
+        }
     }
 
 }

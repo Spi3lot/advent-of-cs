@@ -1,36 +1,49 @@
 ﻿namespace AdventOfCode;
 
-public partial record Day11 : AdventDay<Day11>
+public partial record Day11
 {
 
     private sealed class Stone(ulong number)
     {
 
-        public ulong Number => number;
+        public ulong Number { get; private set; } = number;
 
         public Stone? ApplyRule()
         {
-            if (number == 0) number = 1;
-            else if (CountDigits(number) % 2 == 0) { (number, ulong RightHalf) = SplitNumber(number); return new Stone(RightHalf); }
-            else number *= 2024;
+            if (Number == 0)
+            {
+                Number = 1;
+            }
+            else if (CountDigits(Number) % 2 == 0)
+            {
+                (Number, ulong rightHalf) = SplitNumber(Number);
+                return new Stone(rightHalf);
+            }
+            else
+            {
+                Number *= 2024;
+            }
+
             return null;
         }
 
-        public ulong CountDescendants(int blinkCount)
+        public ulong CountDescendants(int blinkCount, IDictionary<(ulong StoneNumber, int BlinkCount), ulong> cache)
         {
             if (blinkCount == 0) return 1;
-            var leftStone = new Stone(number);
-            var halfStone = leftStone.ApplyRule();
-            ulong descendantCount = 0;
-            if (halfStone != null) descendantCount += halfStone.CountDescendants(blinkCount - 1);
-            return descendantCount + leftStone.CountDescendants(blinkCount - 1);
+            if (cache.ContainsKey((Number, blinkCount))) return cache[(Number, blinkCount)];
+            var leftStone = new Stone(Number);
+            var rightStone = leftStone.ApplyRule();
+            ulong descendantCount = leftStone.CountDescendants(blinkCount - 1, cache);
+            if (rightStone != null) descendantCount += rightStone.CountDescendants(blinkCount - 1, cache);
+            cache.Add((Number, blinkCount), descendantCount);
+            return descendantCount;
         }
 
     }
 
-    public static int CountDigits(ulong number) => 1 + (int)Math.Log10(number);
+    private static int CountDigits(ulong number) => 1 + (int) Math.Log10(number);
 
-    public static (ulong, ulong) SplitNumber(ulong number)
+    private static (ulong, ulong) SplitNumber(ulong number)
     {
         int digitCount = CountDigits(number);
         ulong divisor = Day7.Equation.Pow(10, digitCount / 2);

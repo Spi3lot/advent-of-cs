@@ -75,14 +75,13 @@ public record Day4 : AdventDay<Day4>
             return false;
         }
 
-        var deltas = new[] { (-1, -1), (1, -1) };
-
-        foreach (var delta in deltas)
+        foreach (var delta in new[] { (-1, -1), (1, -1) })
         {
             var start = (center.Item1 + delta.Item1, center.Item2 + delta.Item2);
             var end = (center.Item1 - delta.Item1, center.Item2 - delta.Item2);
 
-            if (!IsOnGrid(start, grid) || !IsOnGrid(end, grid) ||
+            if (!IsOnGrid(start, grid) ||
+                !IsOnGrid(end, grid) ||
                 grid[start.Item2][start.Item1] != MirroredChar(grid[end.Item2][end.Item1]))
             {
                 return false;
@@ -92,7 +91,7 @@ public record Day4 : AdventDay<Day4>
         return true;
     }
 
-    private static bool IsOnGrid((int, int) position, string[] grid)
+    public static bool IsOnGrid((int, int) position, string[] grid)
     {
         return position.Item2 >= 0 && position.Item2 < grid.Length && position.Item1 >= 0 &&
                position.Item1 < grid[position.Item2].Length;
