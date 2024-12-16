@@ -1,9 +1,11 @@
 ﻿namespace AdventOfCode;
 
+using Position = (int X, int Y);
+
 public partial record Day12 : AdventDay<Day12>
 {
 
-    private static readonly (int X, int Y)[] Deltas = [(1, 0), (0, 1), (-1, 0), (0, -1)];
+    private static readonly Position[] Deltas = [(1, 0), (0, 1), (-1, 0), (0, -1)];
 
     private readonly string[] _farm;
 
@@ -16,15 +18,15 @@ public partial record Day12 : AdventDay<Day12>
 
     public override void SolvePart1()
     {
-        Console.WriteLine(CalcTotalFencingPrice(CalcAreaPerimeterFencingPriceForRegion));
+        Console.WriteLine(CalcTotalFencingPrice(CalcRegionPerimeter));
     }
 
     public override void SolvePart2()
     {
-        Console.WriteLine(CalcTotalFencingPrice(CalcAreaSideCountFencingPriceForRegion));
+        Console.WriteLine(CalcTotalFencingPrice(CalcRegionSideCount));
     }
 
-    private int CalcTotalFencingPrice(Func<(int X, int Y), bool[,], int> calcFencingPrice)
+    private int CalcTotalFencingPrice(Func<char, Position, HashSet<Position>, int> calcFactor)
     {
         int totalFencingPrice = 0;
         bool[,] covered = new bool[_farm.Length, _farm[0].Length];
@@ -35,7 +37,7 @@ public partial record Day12 : AdventDay<Day12>
             {
                 if (!covered[j, i])
                 {
-                    totalFencingPrice += calcFencingPrice((i, j), covered);
+                    totalFencingPrice += CalcFencingPriceForRegion((i, j), covered, calcFactor);
                 }
             }
         }
@@ -43,7 +45,25 @@ public partial record Day12 : AdventDay<Day12>
         return totalFencingPrice;
     }
 
-    private bool IsOnPerimeter((int X, int Y) pos, char plantType)
+    private int CalcFencingPriceForRegion(
+        Position position,
+        bool[,] covered,
+        Func<char, Position, HashSet<Position>, int> calcFactor
+    )
+    {
+        HashSet<Position> region = [];
+        int factor = calcFactor(_farm[position.Y][position.X], position, region);
+
+        foreach ((int x, int y) in region)
+        {
+            covered[y, x] = true;
+        }
+
+        int area = region.Count;
+        return area * factor;
+    }
+
+    private bool IsOnPerimeter(Position pos, char plantType)
     {
         return !Day4.IsOnGrid(pos, _farm) || _farm[pos.Y][pos.X] != plantType;
     }

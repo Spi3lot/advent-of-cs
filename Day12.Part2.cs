@@ -1,30 +1,19 @@
 ﻿namespace AdventOfCode;
 
+using Position = (int X, int Y);
+using Plot = ((int X, int Y) Position, bool[] CountPerimeterSide);
+
 public partial record Day12
 {
 
-    private int CalcAreaSideCountFencingPriceForRegion((int X, int Y) position, bool[,] covered)
-    {
-        HashSet<(int X, int Y)> region = [];
-        int perimeter = GetRegionSideCount(_farm[position.Y][position.X], position, region);
-
-        foreach ((int x, int y) in region)
-        {
-            covered[y, x] = true;
-        }
-
-        int area = region.Count;
-        return area * perimeter;
-    }
-
-    private int GetRegionSideCount(
+    private int CalcRegionSideCount(
         char plantType,
-        (int X, int Y) initialPosition,
+        Position initialPosition,
         HashSet<(int, int)> region
     )
     {
         int sideCount = 0;
-        var queue = new Queue<((int X, int Y) Position, bool[] CountPerimeterSide)>();
+        var queue = new Queue<Plot>();
         queue.Enqueue((initialPosition, [true, true, true, true]));
 
         while (queue.TryDequeue(out var current))
@@ -60,8 +49,8 @@ public partial record Day12
     }
 
     private static void MergeDuplicates(
-        (int X, int Y) position,
-        ref Queue<((int X, int Y) Position, bool[] CountPerimeterSide)> queue,
+        Position position,
+        ref Queue<Plot> queue,
         ref bool[] countPerimeterSide
     )
     {
@@ -81,7 +70,7 @@ public partial record Day12
                 ).ToArray()
             );
 
-        queue = new Queue<((int, int), bool[])>(
+        queue = new Queue<Plot>(
             queue.Where((_, index) => !matchingIndices.Contains(index))
         );
     }

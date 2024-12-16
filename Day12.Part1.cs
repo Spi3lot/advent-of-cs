@@ -1,12 +1,14 @@
 ﻿namespace AdventOfCode;
 
+using Position = (int X, int Y);
+
 public partial record Day12
 {
 
-    private int CalcAreaPerimeterFencingPriceForRegion((int X, int Y) position, bool[,] covered)
+    private int CalcAreaPerimeterFencingPriceForRegion(Position position, bool[,] covered)
     {
-        HashSet<(int X, int Y)> region = [];
-        int perimeter = GetRegionPerimeter(_farm[position.Y][position.X], position, region);
+        HashSet<Position> region = [];
+        int perimeter = CalcRegionPerimeter(_farm[position.Y][position.X], position, region);
 
         foreach ((int x, int y) in region)
         {
@@ -17,16 +19,16 @@ public partial record Day12
         return area * perimeter;
     }
 
-    private int GetRegionPerimeter(
+    private int CalcRegionPerimeter(
         char plantType,
-        (int X, int Y) pos,
-        HashSet<(int, int)> region
+        Position pos,
+        HashSet<Position> region
     )
     {
         if (IsOnPerimeter(pos, plantType)) return 1;
         if (region.Contains(pos)) return 0;
         region.Add((pos.X, pos.Y));
-        return Deltas.Sum(delta => GetRegionPerimeter(plantType, (pos.X + delta.X, pos.Y + delta.Y), region));
+        return Deltas.Sum(delta => CalcRegionPerimeter(plantType, (pos.X + delta.X, pos.Y + delta.Y), region));
     }
 
 }

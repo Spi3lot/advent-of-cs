@@ -7,7 +7,7 @@ public static class Launcher
 
     public static void Main()
     {
-        var day = new Day12();
+        var day = new Day13();
         SolvePartsAndPrintElapsedTimes(day);
     }
 
