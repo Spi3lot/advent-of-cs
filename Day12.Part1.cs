@@ -7,13 +7,13 @@ public partial record Day12
     {
         HashSet<(int X, int Y)> region = [];
         int perimeter = GetRegionPerimeter(_farm[position.Y][position.X], position, region);
-        int area = region.Count;
 
         foreach ((int x, int y) in region)
         {
             covered[y, x] = true;
         }
 
+        int area = region.Count;
         return area * perimeter;
     }
 

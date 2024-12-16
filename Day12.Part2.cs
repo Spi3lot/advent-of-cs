@@ -6,7 +6,7 @@ public partial record Day12
     private int CalcAreaSideCountFencingPriceForRegion((int X, int Y) position, bool[,] covered)
     {
         HashSet<(int X, int Y)> region = [];
-        int perimeter = GetRegionSideCount(_farm[position.Y][position.X], region, position);
+        int perimeter = GetRegionSideCount(_farm[position.Y][position.X], position, region);
 
         foreach ((int x, int y) in region)
         {
@@ -19,8 +19,8 @@ public partial record Day12
 
     private int GetRegionSideCount(
         char plantType,
-        HashSet<(int, int)> region,
-        (int X, int Y) initialPosition
+        (int X, int Y) initialPosition,
+        HashSet<(int, int)> region
     )
     {
         int sideCount = 0;
