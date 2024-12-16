@@ -21,8 +21,7 @@ public record Day12 : AdventDay<Day12>
 
     public override void SolvePart2()
     {
-        Console.WriteLine(CalcAreaSideCountFencingPriceForRegion((0, 1), new bool[_farm.Length, _farm[0].Length]));
-        // Console.WriteLine(CalcTotalFencingPrice(CalcAreaSideCountFencingPriceForRegion));
+        Console.WriteLine(CalcTotalFencingPrice(CalcAreaSideCountFencingPriceForRegion));
     }
 
     private int CalcTotalFencingPrice(Func<(int X, int Y), bool[,], int> calcFencingPrice)
@@ -68,14 +67,7 @@ public record Day12 : AdventDay<Day12>
     private int CalcAreaSideCountFencingPriceForRegion((int X, int Y) position, bool[,] covered)
     {
         HashSet<(int X, int Y)> region = [];
-
-        int perimeter = GetRegionSideCount(
-            _farm[position.Y][position.X],
-            region,
-            position,
-            null,
-            new bool[4]
-        );
+        int perimeter = GetRegionSideCount(_farm[position.Y][position.X], region, position);
 
         foreach ((int x, int y) in region)
         {
@@ -89,46 +81,59 @@ public record Day12 : AdventDay<Day12>
     private int GetRegionSideCount(
         char plantType,
         HashSet<(int, int)> region,
-        (int X, int Y) pos,
-        int? deltaIndex,
-        bool[] alreadyCountedPerimeterSide
+        (int X, int Y) initialPosition
     )
     {
-        if (IsOnPerimeter(pos, plantType))
-            return (deltaIndex == null || !alreadyCountedPerimeterSide[deltaIndex.Value]) ? 1 : 0;
+        int sideCount = 0;
+        var queue = new Queue<((int X, int Y) Position, bool[] CountPerimeterSide)>();
+        queue.Enqueue((initialPosition, [true, true, true, true]));
 
-        if (region.Contains(pos)) return 0;
-        region.Add((pos.X, pos.Y));
-
-        for (int i = 0; i < Deltas.Length; i++)
+        while (queue.TryDequeue(out var current))
         {
-            alreadyCountedPerimeterSide[i] |= IsOnPerimeter(
-                (pos.X + Deltas[i].X, pos.Y + Deltas[i].Y),
-                plantType
-            );
+            var (Position, CountPerimeterSide) = current;
+            var neighbors = Deltas.Select(delta => (Position.X + delta.X, Position.Y + delta.Y)).ToArray();
+            region.Add(Position);
+
+            var matches = queue
+                    .Select((plot, index) => (Value: plot, Index: index))
+                    .Where(plot => plot.Value.Position == Position);
+
+            var matchingIndices = matches.Select(plot => plot.Index).ToHashSet();
+
+            CountPerimeterSide = matches
+                .Select(plot => plot.Value.CountPerimeterSide)
+                .Aggregate(CountPerimeterSide, (resultBools, currentBools) => resultBools.Select((resultBool, index) => resultBool && currentBools[index]).ToArray());
+
+            queue = new Queue<((int, int), bool[])>(queue.Where((plot, index) => !matchingIndices.Contains(index)));
+
+            for (int i = 0; i < neighbors.Length; i++)
+            {
+                if (!IsOnPerimeter(neighbors[i], plantType) || region.Contains(neighbors[i]))
+                {
+                    CountPerimeterSide[i] = true;
+                }
+                else
+                {
+                    if (CountPerimeterSide[i]) sideCount++;
+                    CountPerimeterSide[i] = false;
+                }
+            }
+
+            for (int i = 0; i < neighbors.Length; i++)
+            {
+                if (CountPerimeterSide[i] && !region.Contains(neighbors[i]))
+                {
+                    queue.Enqueue((neighbors[i], [.. CountPerimeterSide]));
+                }
+            }
         }
 
-        return Deltas
-            .Select((delta, index) => GetRegionSideCount(
-                plantType,
-                region,
-                (pos.X + delta.X, pos.Y + delta.X),
-                index,
-                CopyAndSetIndexToFalse(alreadyCountedPerimeterSide, index) // Should not be necessary to set to false
-            ))
-            .Sum();
+        return sideCount;
     }
 
     private bool IsOnPerimeter((int X, int Y) pos, char plantType)
     {
         return !Day4.IsOnGrid(pos, _farm) || _farm[pos.Y][pos.X] != plantType;
-    }
-
-    private static bool[] CopyAndSetIndexToFalse(bool[] array, int index)
-    {
-        return array
-            .Select((item, i) => item && (i != index))
-            .ToArray();
     }
 
 }
