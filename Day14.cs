@@ -12,7 +12,7 @@ public partial record Day14 : AdventDay<Day14>
     private void InitializeRobots()
     {
         _robots.Clear();
-        
+
         foreach (var robot in Input.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line)).Select(Robot.Parse))
         {
             _robots.Add(robot);
@@ -38,7 +38,7 @@ public partial record Day14 : AdventDay<Day14>
         if (robot.Position[0] == _gridDimensions[0] / 2 || robot.Position[1] == _gridDimensions[1] / 2) return -1;
         long x = 2 * robot.Position[0] / _gridDimensions[0];
         long y = 2 * robot.Position[1] / _gridDimensions[1];
-        return (int)(y << 1 | x);
+        return (int) ((y << 1) | x);
     }
 
 }
