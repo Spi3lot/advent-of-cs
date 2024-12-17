@@ -5,18 +5,9 @@ using Position = (int X, int Y);
 public partial record Day12
 {
 
-    private int CalcAreaPerimeterFencingPriceForRegion(Position position, bool[,] covered)
+    public override void SolvePart1()
     {
-        HashSet<Position> region = [];
-        int perimeter = CalcRegionPerimeter(_farm[position.Y][position.X], position, region);
-
-        foreach ((int x, int y) in region)
-        {
-            covered[y, x] = true;
-        }
-
-        int area = region.Count;
-        return area * perimeter;
+        Console.WriteLine(CalcTotalFencingPrice(CalcRegionPerimeter));
     }
 
     private int CalcRegionPerimeter(

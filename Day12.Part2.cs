@@ -6,6 +6,11 @@ using Plot = ((int X, int Y) Position, bool[] CountPerimeterSide);
 public partial record Day12
 {
 
+    public override void SolvePart2()
+    {
+        Console.WriteLine(CalcTotalFencingPrice(CalcRegionSideCount));
+    }
+
     private int CalcRegionSideCount(
         char plantType,
         Position initialPosition,
@@ -59,8 +64,6 @@ public partial record Day12
             .Where(plot => plot.Value.Position == position)
             .ToList();
 
-        var matchingIndices = matches.Select(plot => plot.Index).ToHashSet();
-
         countPerimeterSide = matches
             .Select(plot => plot.Value.CountPerimeterSide)
             .Aggregate(
@@ -70,9 +73,8 @@ public partial record Day12
                 ).ToArray()
             );
 
-        queue = new Queue<Plot>(
-            queue.Where((_, index) => !matchingIndices.Contains(index))
-        );
+        var matchingIndices = matches.Select(plot => plot.Index).ToHashSet();
+        queue = new Queue<Plot>(queue.Where((_, index) => !matchingIndices.Contains(index)));
     }
 
 }

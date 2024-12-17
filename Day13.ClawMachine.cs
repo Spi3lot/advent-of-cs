@@ -36,6 +36,11 @@ public partial record Day13
             var prizeLocation = (coordinates[2].X, coordinates[2].Y);
             return new ClawMachine(buttons, prizeLocation);
         }
+        public int CalcMinimumTokenCountForPrize()
+        {
+            var pressCount = (A: 0, B: PrizeLocation.X / Buttons.B.X);
+            return Buttons.A.Cost * pressCount.A + Buttons.B.Cost * Buttons.B.Cost;
+        }
 
     }
 

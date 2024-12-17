@@ -1,9 +1,9 @@
 ﻿namespace AdventOfCode;
 
-public abstract record AdventDay<T>(string Input) where T : AdventDay<T>
+public abstract record AdventDay<TSelf>(string Input) where TSelf : AdventDay<TSelf>
 {
 
-    protected AdventDay() : this(File.ReadAllText($"../../../inputs/{typeof(T).Name}.txt")) { }
+    protected AdventDay() : this(File.ReadAllText($"../../../inputs/{typeof(TSelf).Name}.txt")) { }
 
     public abstract void SolvePart1();
 

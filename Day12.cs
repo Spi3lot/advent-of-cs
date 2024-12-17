@@ -16,16 +16,6 @@ public partial record Day12 : AdventDay<Day12>
             .ToArray();
     }
 
-    public override void SolvePart1()
-    {
-        Console.WriteLine(CalcTotalFencingPrice(CalcRegionPerimeter));
-    }
-
-    public override void SolvePart2()
-    {
-        Console.WriteLine(CalcTotalFencingPrice(CalcRegionSideCount));
-    }
-
     private int CalcTotalFencingPrice(Func<char, Position, HashSet<Position>, int> calcFactor)
     {
         int totalFencingPrice = 0;
