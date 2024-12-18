@@ -1,11 +1,7 @@
-﻿using System;
+﻿namespace AdventOfCode;
 
-namespace AdventOfCode;
-
-public partial record Day15 : AdventDay<Day15>
+public partial record Day15
 {
-
-    private readonly Robot _robot = new();
 
     private string? _movements;
 
@@ -17,10 +13,16 @@ public partial record Day15 : AdventDay<Day15>
         char[][] grid = parts[0].Split('\n')
             .Select(line => line.ToCharArray())
             .ToArray();
-            
-        _robot.Grid = JaggedTo2D(grid);
 
-        _robot.GpsCoordinates = grid
+        Part1.Bot.Grid = JaggedTo2D(grid);
+
+        // TODO: fill
+        Part2.Bot.Grid = new char[
+            Part1.Bot.Grid.GetLength(0),
+            Part1.Bot.Grid.GetLength(1)
+        ];
+
+        Part1.Bot.GpsCoordinates = grid
             .Select((line, j) => (
                 line: line
                     .Select((char @char, int i)? (@char, i) => (@char, i))
@@ -30,33 +32,29 @@ public partial record Day15 : AdventDay<Day15>
             .Where(indexedLine => indexedLine.line.HasValue)
             .Select(indexedLine => (indexedLine.line!.Value.i, indexedLine.j))
             .Single();
-    }
-    
-    public override void SolvePart1()
-    {
-        Initialize();
 
-        foreach (char movement in _movements!)
-        {
-            _robot.Move(movement);
-        }
 
-        Console.WriteLine(_robot.SumBoxGpsCoordinates());
+        Part2.Bot.GpsCoordinates = (2 * Part1.Bot.GpsCoordinates.X, 2 * Part1.Bot.GpsCoordinates.Y);
     }
 
-    public override void SolvePart2() { }
-
-    internal static T[,] JaggedTo2D<T>(T[][] source)
+    private static T[,] JaggedTo2D<T>(T[][] source)
     {
         try
         {
-            int FirstDim = source.Length;
-            int SecondDim = source.GroupBy(row => row.Length).Single().Key; // throws InvalidOperationException if source is not rectangular
+            int dim0 = source.Length;
 
-            var result = new T[FirstDim, SecondDim];
-            for (int i = 0; i < FirstDim; ++i)
-                for (int j = 0; j < SecondDim; ++j)
+            int dim1 = source.GroupBy(row => row.Length).Single()
+                .Key; // throws InvalidOperationException if source is not rectangular
+
+            var result = new T[dim0, dim1];
+
+            for (int i = 0; i < dim0; ++i)
+            {
+                for (int j = 0; j < dim1; ++j)
+                {
                     result[i, j] = source[i][j];
+                }
+            }
 
             return result;
         }
