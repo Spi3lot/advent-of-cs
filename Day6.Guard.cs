@@ -61,9 +61,7 @@ public partial record Day6
             while (Move())
             {
                 if (WasInCurrentSituationBefore()) return null;
-
                 if (!VisitedCurrentPositionAlready()) count++;
-
                 UpdateFlagsForCurrentPosition();
             }
 

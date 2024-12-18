@@ -4,7 +4,7 @@ namespace AdventOfCode;
 
 public static class Launcher
 {
-
+   
     public static void Main()
     {
         var day = new Day15();

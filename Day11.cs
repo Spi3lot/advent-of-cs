@@ -19,7 +19,7 @@ public partial record Day11 : AdventDay<Day11>
 
         for (int i = 0; i < 25; i++)
         {
-            foreach (var stone in (ICollection<Stone>) [.. stones])
+            foreach (var stone in (ICollection<Stone>)[.. stones])
             {
                 var halfStone = stone.ApplyRule();
                 if (halfStone != null) stones.Add(halfStone);
@@ -34,13 +34,12 @@ public partial record Day11 : AdventDay<Day11>
     {
         var cache = new Dictionary<(ulong, int), ulong>();
 
-        checked
-        {
-            ulong total = _stones.Aggregate<Stone, ulong>(0,
-                (current, stone) => current + stone.CountDescendants(75, cache));
+        ulong total = _stones.Aggregate<Stone, ulong>(
+            0,
+            (current, stone) => checked(current + stone.CountDescendants(75, cache))
+        );
 
-            Console.WriteLine(total);
-        }
+        Console.WriteLine(total);
     }
 
 }

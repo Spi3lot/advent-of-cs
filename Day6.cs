@@ -34,7 +34,6 @@ public partial record Day6 : AdventDay<Day6>
             for (int i = 0; i < _grid[j].Length; i++)
             {
                 if (_grid[j][i] != CellConditions.None) continue;
-
                 _guard.Grid[j][i] = CellConditions.Obstacle;
 
                 if (_guard.PatrolAndCountUniquePositions() == null)

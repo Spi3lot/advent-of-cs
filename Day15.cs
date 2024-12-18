@@ -1,42 +1,69 @@
-﻿using System.Runtime.Intrinsics;
+﻿using System;
 
 namespace AdventOfCode;
 
-public record Day15 : AdventDay<Day15>
+public partial record Day15 : AdventDay<Day15>
 {
 
-    private readonly string[] _grid;
+    private readonly Robot _robot = new();
 
-    private readonly string _movements;
+    private string? _movements;
 
-    private readonly (int X, int Y) _robotPosition;
-
-    public Day15()
+    private void Initialize()
     {
         string[] parts = Input.Split("\n\n");
-        _grid = parts[0].Split('\n');
         _movements = parts[1].Trim();
 
-        _robotPosition = _grid
+        char[][] grid = parts[0].Split('\n')
+            .Select(line => line.ToCharArray())
+            .ToArray();
+            
+        _robot.Grid = JaggedTo2D(grid);
+
+        _robot.GpsCoordinates = grid
             .Select((line, j) => (
-                line
+                line: line
                     .Select((char @char, int i)? (@char, i) => (@char, i))
-                    .Where(indexedChar => indexedChar != null)
-                    .First(indexedChar => indexedChar!.Value.@char == '@')
-                    .Value
-                    .i,
+                    .FirstOrDefault(indexedChar => indexedChar!.Value.@char == '@'),
                 j
             ))
-            .First();
-
-        Console.WriteLine(_robotPosition);
+            .Where(indexedLine => indexedLine.line.HasValue)
+            .Select(indexedLine => (indexedLine.line!.Value.i, indexedLine.j))
+            .Single();
     }
-
+    
     public override void SolvePart1()
     {
-        Console.WriteLine(_movements);
+        Initialize();
+
+        foreach (char movement in _movements!)
+        {
+            _robot.Move(movement);
+        }
+
+        Console.WriteLine(_robot.SumBoxGpsCoordinates());
     }
 
     public override void SolvePart2() { }
+
+    internal static T[,] JaggedTo2D<T>(T[][] source)
+    {
+        try
+        {
+            int FirstDim = source.Length;
+            int SecondDim = source.GroupBy(row => row.Length).Single().Key; // throws InvalidOperationException if source is not rectangular
+
+            var result = new T[FirstDim, SecondDim];
+            for (int i = 0; i < FirstDim; ++i)
+                for (int j = 0; j < SecondDim; ++j)
+                    result[i, j] = source[i][j];
+
+            return result;
+        }
+        catch (InvalidOperationException)
+        {
+            throw new InvalidOperationException("The given jagged array is not rectangular.");
+        }
+    }
 
 }

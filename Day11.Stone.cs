@@ -30,7 +30,7 @@ public partial record Day11
         public ulong CountDescendants(int blinkCount, IDictionary<(ulong StoneNumber, int BlinkCount), ulong> cache)
         {
             if (blinkCount == 0) return 1;
-            if (cache.ContainsKey((Number, blinkCount))) return cache[(Number, blinkCount)];
+            if (cache.TryGetValue((Number, blinkCount), out ulong cached)) return cached;
             var leftStone = new Stone(Number);
             var rightStone = leftStone.ApplyRule();
             ulong descendantCount = leftStone.CountDescendants(blinkCount - 1, cache);
