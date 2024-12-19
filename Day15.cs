@@ -14,20 +14,25 @@ public partial record Day15 : AdventDay<Day15>
             .Select(line => line.ToCharArray())
             .ToArray();
 
-        Part1.Bot.Grid = grid.To2D();
+        _singleChestRobot.Grid = grid.To2D();
 
-        Part2.Bot.Grid = new char[
-            Part1.Bot.Grid.GetLength(0),
-            Part1.Bot.Grid.GetLength(1) * 2
+        _doubleChestRobot.Grid = new char[
+            _singleChestRobot.Grid.GetLength(0),
+            _singleChestRobot.Grid.GetLength(1) * 2
         ];
 
-        Part1.Bot.Grid.ForEachCell((cell, i, j) =>
+        _singleChestRobot.Grid.ForEachCell((cell, i, j) =>
         {
-            Part2.Bot.Grid[j, 2 * i] = (cell == 'O') ? '[' : cell;
-            Part2.Bot.Grid[j, 2 * i + 1] = (cell == 'O') ? ']' : ((cell == '#') ? '#' : '.');
+            _doubleChestRobot.Grid[j, 2 * i] = (cell == 'O') ? '[' : cell;
+            _doubleChestRobot.Grid[j, 2 * i + 1] = cell switch
+            {
+                'O' => ']',
+                '#' => '#',
+                _ => '.'
+            };
         });
 
-        Part1.Bot.GpsCoordinates = grid
+        _singleChestRobot.GpsCoordinates = grid
             .Select((line, j) => (
                 line: line
                     .Select((char @char, int i)? (@char, i) => (@char, i))
@@ -38,11 +43,10 @@ public partial record Day15 : AdventDay<Day15>
             .Select(indexedLine => (indexedLine.line!.Value.i, indexedLine.j))
             .Single();
 
-
-        Part2.Bot.GpsCoordinates = (2 * Part1.Bot.GpsCoordinates.X, Part1.Bot.GpsCoordinates.Y);
+        _doubleChestRobot.GpsCoordinates = (2 * _singleChestRobot.GpsCoordinates.X, _singleChestRobot.GpsCoordinates.Y);
     }
 
-    private void SolvePart(RobotBase robot)
+    private void SolvePart(Robot robot)
     {
         foreach (char movement in _movements)
         {

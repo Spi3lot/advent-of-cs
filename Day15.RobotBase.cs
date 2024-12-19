@@ -3,12 +3,13 @@
 public partial record Day15
 {
 
-    public abstract class RobotBase
+    public abstract class Robot
     {
 
-        public char[,]? Grid;
+        protected internal char[,]? Grid;
 
-        public (int X, int Y) GpsCoordinates;
+        protected internal (int X, int Y) GpsCoordinates;
+        
         protected abstract bool Move((int X, int Y) delta);
 
         public bool Move(char movement)
