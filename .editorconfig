@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# S3358: Ternary operators should not be nested
+dotnet_diagnostic.S3358.severity = suggestion
+
+# S2368: Public methods should not have multidimensional array parameters
+dotnet_diagnostic.S2368.severity = suggestion

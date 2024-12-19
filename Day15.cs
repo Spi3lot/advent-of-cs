@@ -1,11 +1,11 @@
 ﻿namespace AdventOfCode;
 
-public partial record Day15
+public partial record Day15 : AdventDay<Day15>
 {
 
-    private string? _movements;
+    private readonly string _movements;
 
-    private void Initialize()
+    public Day15()
     {
         string[] parts = Input.Split("\n\n");
         _movements = parts[1].Trim();
@@ -14,13 +14,18 @@ public partial record Day15
             .Select(line => line.ToCharArray())
             .ToArray();
 
-        Part1.Bot.Grid = JaggedTo2D(grid);
+        Part1.Bot.Grid = grid.To2D();
 
-        // TODO: fill
         Part2.Bot.Grid = new char[
             Part1.Bot.Grid.GetLength(0),
-            Part1.Bot.Grid.GetLength(1)
+            Part1.Bot.Grid.GetLength(1) * 2
         ];
+
+        Part1.Bot.Grid.ForEachCell((cell, i, j) =>
+        {
+            Part2.Bot.Grid[j, 2 * i] = (cell == 'O') ? '[' : cell;
+            Part2.Bot.Grid[j, 2 * i + 1] = (cell == 'O') ? ']' : ((cell == '#') ? '#' : '.');
+        });
 
         Part1.Bot.GpsCoordinates = grid
             .Select((line, j) => (
@@ -34,34 +39,17 @@ public partial record Day15
             .Single();
 
 
-        Part2.Bot.GpsCoordinates = (2 * Part1.Bot.GpsCoordinates.X, 2 * Part1.Bot.GpsCoordinates.Y);
+        Part2.Bot.GpsCoordinates = (2 * Part1.Bot.GpsCoordinates.X, Part1.Bot.GpsCoordinates.Y);
     }
 
-    private static T[,] JaggedTo2D<T>(T[][] source)
+    private void SolvePart(RobotBase robot)
     {
-        try
+        foreach (char movement in _movements)
         {
-            int dim0 = source.Length;
-
-            int dim1 = source.GroupBy(row => row.Length).Single()
-                .Key; // throws InvalidOperationException if source is not rectangular
-
-            var result = new T[dim0, dim1];
-
-            for (int i = 0; i < dim0; ++i)
-            {
-                for (int j = 0; j < dim1; ++j)
-                {
-                    result[i, j] = source[i][j];
-                }
-            }
-
-            return result;
+            robot.Move(movement);
         }
-        catch (InvalidOperationException)
-        {
-            throw new InvalidOperationException("The given jagged array is not rectangular.");
-        }
+
+        Console.WriteLine(robot.SumBoxGpsCoordinates());
     }
 
 }
