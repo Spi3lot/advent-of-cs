@@ -27,7 +27,7 @@ public partial record Day15
         public long SumBoxGpsCoordinates()
         {
             long sum = 0;
-            Grid!.ForEachCell((cell, i, j) => sum += (cell == 'O') ? 100 * j + i : 0);
+            Grid!.ForEachCell((cell, i, j) => sum += (cell is 'O' or '[') ? 100 * j + i : 0);
             return sum;
         }
 

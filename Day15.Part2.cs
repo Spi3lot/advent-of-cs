@@ -17,51 +17,57 @@ public partial record Day15
 
         protected override bool Move(Vector2i delta)
         {
-            /* ONLY FOR REFERENCE
-            var vacant = (X: GpsCoordinates.X + delta.X, Y: GpsCoordinates.Y + delta.Y);
-            char current;
-
-            while ((current = Grid![vacant.Y, vacant.X]) != '.')
-            {
-                vacant.X += delta.X;
-                vacant.Y += delta.Y;
-                if (current == '#') return false;
-            }
-
-            // If the robot did not have to push any chests,
-            // the O will get overwritten by an @ anyway
-            Grid[vacant.Y, vacant.X] = 'O';
-            Grid[GpsCoordinates.Y, GpsCoordinates.X] = '.';
-            GpsCoordinates.X += delta.X;
-            GpsCoordinates.Y += delta.Y;
-            Grid[GpsCoordinates.Y, GpsCoordinates.X] = '@';
-            */
+            var position = GetObjectPosition(GpsCoordinates)!;
+            if (!CanMove(position, delta)) return false;
+            Move(position, delta);
             return true;
         }
 
-        // TODO: merge with CanChestMove?
-        private bool CanMove(Vector2i position, Vector2i delta)
+        private void Move(IObjectPosition position, Vector2i delta)
         {
-            Vector2i offset = (position.X + delta.X, position.Y + delta.Y);
-            char cell = Grid![offset.Y, offset.X];
-
-            return cell switch
+            foreach (var obstruction in GetObstructions(position, delta))
             {
-                '[' => CanChestMove((offset, (offset.X + 1, offset.Y)), delta),
-                ']' => CanChestMove(((offset.X - 1, offset.Y), offset), delta),
-                '.' => true,
-                _ => false,
-            };
+                Move(obstruction, delta);
+            }
+
+            foreach (var value in position)
+            {
+                Vector2i moved = (value.Y + delta.Y, value.X + delta.X);
+                (Grid![moved.Y,moved.X], Grid[value.Y, value.X]) = (Grid[value.Y, value.X], Grid[moved.Y, moved.X]);
+            }
         }
 
-        private bool CanChestMove((Vector2i Left, Vector2i Right) position, Vector2i delta)
+        private bool CanMove(IObjectPosition position, Vector2i delta)
         {
-            (Vector2i Left, Vector2i Right) offset = (
-                (position.Left.X + delta.X, position.Left.Y + delta.Y),
-                (position.Right.X + delta.X, position.Right.Y + delta.Y)
-            );
+            return GetObstructions(position, delta)
+                .All(obstruction => obstruction is ChestPosition chest && CanMove(chest, delta));
+        }
 
-            if (true) return false;
+        private HashSet<IObjectPosition> GetObstructions(IObjectPosition position, Vector2i delta)
+        {
+            return position
+                .Select(value => (value.X + delta.X, value.Y + delta.Y))
+                .Select(GetObjectPosition)
+                .Where(objectPosition => objectPosition != null)
+                .Select(objectPosition => objectPosition!)
+                .Where(objectPosition => objectPosition != position)
+                .ToHashSet();
+        }
+
+        private IObjectPosition? GetObjectPosition(Vector2i position)
+        {
+            return Grid![position.Y, position.X] switch
+            {
+                '[' => new ChestPosition(position, (position.X + 1, position.Y)),
+                ']' => new ChestPosition((position.X - 1, position.Y), position),
+                '#' => new WallPosition(position),
+                '@' => new RobotPosition(position),
+                '.' => null,
+                _ => throw new ArgumentException(
+                    $"Invalid object {Grid![position.Y, position.X]} at ${position}",
+                    nameof(position)
+                )
+            };
         }
 
     }
