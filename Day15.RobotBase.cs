@@ -3,10 +3,10 @@
 public partial record Day15
 {
 
-    public abstract class Robot
+    public abstract class Robot(char[,] grid)
     {
 
-        protected internal char[,]? Grid;
+        protected internal char[,] Grid = grid;
 
         protected internal (int X, int Y) GpsCoordinates;
         
@@ -27,7 +27,7 @@ public partial record Day15
         public long SumBoxGpsCoordinates()
         {
             long sum = 0;
-            Grid!.ForEachCell((cell, i, j) => sum += (cell is 'O' or '[') ? 100 * j + i : 0);
+            Grid.ForEachCell((cell, i, j) => sum += (cell is 'O' or '[') ? 100 * j + i : 0);
             return sum;
         }
 

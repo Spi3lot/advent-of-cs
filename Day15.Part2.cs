@@ -1,18 +1,22 @@
-﻿namespace AdventOfCode;
+﻿using System;
+using System.Text;
 
+namespace AdventOfCode;
+
+using static AdventOfCode.Day15;
 using Vector2i = (int X, int Y);
 
 public partial record Day15
 {
 
-    private readonly DoubleChestRobot _doubleChestRobot = new();
+    private readonly DoubleChestRobot _doubleChestRobot;
 
     public override void SolvePart2()
     {
-        SolvePart(_doubleChestRobot);
+        MoveRobot(_doubleChestRobot);
     }
 
-    public class DoubleChestRobot : Robot
+    public class DoubleChestRobot(char[,] grid) : Robot(grid)
     {
 
         protected override bool Move(Vector2i delta)
@@ -20,6 +24,7 @@ public partial record Day15
             var position = GetObjectPosition(GpsCoordinates)!;
             if (!CanMove(position, delta)) return false;
             Move(position, delta);
+            (GpsCoordinates.X, GpsCoordinates.Y) = (GpsCoordinates.X + delta.X, GpsCoordinates.Y + delta.Y);
             return true;
         }
 
@@ -30,10 +35,10 @@ public partial record Day15
                 Move(obstruction, delta);
             }
 
-            foreach (var value in position)
+            foreach (var (X, Y) in position)
             {
-                Vector2i moved = (value.Y + delta.Y, value.X + delta.X);
-                (Grid![moved.Y,moved.X], Grid[value.Y, value.X]) = (Grid[value.Y, value.X], Grid[moved.Y, moved.X]);
+                Vector2i moved = (X + delta.X, Y + delta.Y);
+                (Grid[moved.Y, moved.X], Grid[Y, X]) = (Grid[Y, X], Grid[moved.Y, moved.X]);
             }
         }
 
@@ -50,13 +55,13 @@ public partial record Day15
                 .Select(GetObjectPosition)
                 .Where(objectPosition => objectPosition != null)
                 .Select(objectPosition => objectPosition!)
-                .Where(objectPosition => objectPosition != position)
+                .Where(objectPosition => !objectPosition.SequenceEqual(position))
                 .ToHashSet();
         }
 
         private IObjectPosition? GetObjectPosition(Vector2i position)
         {
-            return Grid![position.Y, position.X] switch
+            return Grid[position.Y, position.X] switch
             {
                 '[' => new ChestPosition(position, (position.X + 1, position.Y)),
                 ']' => new ChestPosition((position.X - 1, position.Y), position),
@@ -64,7 +69,7 @@ public partial record Day15
                 '@' => new RobotPosition(position),
                 '.' => null,
                 _ => throw new ArgumentException(
-                    $"Invalid object {Grid![position.Y, position.X]} at ${position}",
+                    $"Invalid object {Grid[position.Y, position.X]} at ${position}",
                     nameof(position)
                 )
             };

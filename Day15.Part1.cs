@@ -3,14 +3,14 @@
 public partial record Day15
 {
 
-    private readonly SingleChestRobot _singleChestRobot = new();
+    private readonly SingleChestRobot _singleChestRobot;
 
     public override void SolvePart1()
     {
-        SolvePart(_singleChestRobot);
+        MoveRobot(_singleChestRobot);
     }
 
-    public class SingleChestRobot : Robot
+    public class SingleChestRobot(char[,] grid) : Robot(grid)
     {
 
         protected override bool Move((int X, int Y) delta)
@@ -18,7 +18,7 @@ public partial record Day15
             var vacant = (X: GpsCoordinates.X + delta.X, Y: GpsCoordinates.Y + delta.Y);
             char current;
 
-            while ((current = Grid![vacant.Y, vacant.X]) != '.')
+            while ((current = Grid[vacant.Y, vacant.X]) != '.')
             {
                 vacant.X += delta.X;
                 vacant.Y += delta.Y;

@@ -14,12 +14,12 @@ public partial record Day15 : AdventDay<Day15>
             .Select(line => line.ToCharArray())
             .ToArray();
 
-        _singleChestRobot.Grid = grid.To2D();
+        _singleChestRobot = new SingleChestRobot(grid.To2D());
 
-        _doubleChestRobot.Grid = new char[
+        _doubleChestRobot = new DoubleChestRobot(new char[
             _singleChestRobot.Grid.GetLength(0),
             _singleChestRobot.Grid.GetLength(1) * 2
-        ];
+        ]);
 
         _singleChestRobot.Grid.ForEachCell((cell, i, j) =>
         {
@@ -46,7 +46,7 @@ public partial record Day15 : AdventDay<Day15>
         _doubleChestRobot.GpsCoordinates = (2 * _singleChestRobot.GpsCoordinates.X, _singleChestRobot.GpsCoordinates.Y);
     }
 
-    private void SolvePart(Robot robot)
+    private void MoveRobot(Robot robot)
     {
         foreach (char movement in _movements)
         {
