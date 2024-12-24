@@ -54,49 +54,7 @@ public partial record Day23 : AdventDay<Day23>
             return interconnections;
         }
 
-        public readonly ICollection<Interconnection> GetInterconnections(int depth)
-        {
-            ICollection<Interconnection> interconnections = [];
-            GetInterconnections(depth, this, [], [this], interconnections);
-            return interconnections;
-        }
-
-        public readonly void GetInterconnections(
-            int depth,
-            Computer origin,
-            HashSet<Computer> visited,
-            Interconnection currentInterconnection,
-            ICollection<Interconnection> interconnections
-        )
-        {
-            foreach (var connection in Connections[this])
-            {
-                if (visited.Contains(connection)) continue;
-
-                // 2 because we start 1 step ahead and
-                // know when to stop 1 step before the end
-                if (connection == origin)
-                {
-                    if (depth == 2)
-                    {
-                        interconnections.Add(currentInterconnection);
-                        return;
-                    }
-
-                    continue;
-                }
-
-                connection.GetInterconnections(
-                    depth - 1,
-                    origin,
-                    [.. visited, connection],
-                    [.. currentInterconnection, connection],
-                    interconnections
-                );
-            }
-        }
-
-        public int CompareTo(Computer other)
+        public readonly int CompareTo(Computer other)
         {
             return Name.CompareTo(other.Name);
         }
