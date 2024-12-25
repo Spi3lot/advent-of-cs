@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace AdventOfCode;
 
-public partial record Day23 : AdventDay<Day23>
+public partial record Day23
 {
 
     private sealed class Interconnection : HashSet<Computer>
