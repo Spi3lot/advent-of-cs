@@ -41,21 +41,35 @@ public record Day24 : AdventDay<Day24>
 
     public override void SolvePart1()
     {
-        ulong z = 0;
-
-        for (int i = 0; _wires.TryGetValue(GetWireNameForBit('z', i), out var func); i++)
-        {
-            if (func()) z |= 1uL << i;
-        }
-
-        Console.WriteLine(z);
+        Console.WriteLine(GetValueForVariable('z'));
     }
 
-    public override void SolvePart2() { }
+    public override void SolvePart2()
+    {
+        ulong x = GetValueForVariable('x');
+        ulong y = GetValueForVariable('y');
+        ulong z = GetValueForVariable('z');
+        Console.WriteLine($"x = {x}");
+        Console.WriteLine($"y = {y}");
+        Console.WriteLine($"x + y = {x + y}");
+        Console.WriteLine($"z = {z}");
+    }
 
     private static string DetermineOperator(string gate)
     {
         return Operators.Keys.First(gate.Contains);
+    }
+
+    private ulong GetValueForVariable(char variableName)
+    {
+        ulong variable = 0;
+
+        for (int i = 0; _wires.TryGetValue(GetWireNameForBit(variableName, i), out var func); i++)
+        {
+            if (func()) variable |= 1uL << i;
+        }
+
+        return variable;
     }
 
     private static string GetWireNameForBit(char variableName, int bit)
