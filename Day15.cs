@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode;
+﻿using ILGPU;
+
+namespace AdventOfCode;
 
 public partial record Day15 : AdventDay<Day15>
 {
@@ -24,6 +26,7 @@ public partial record Day15 : AdventDay<Day15>
         _singleChestRobot.Grid.ForEachCell((cell, i, j) =>
         {
             _doubleChestRobot.Grid[j, 2 * i] = (cell == 'O') ? '[' : cell;
+
             _doubleChestRobot.Grid[j, 2 * i + 1] = cell switch
             {
                 'O' => ']',
@@ -46,7 +49,7 @@ public partial record Day15 : AdventDay<Day15>
         _doubleChestRobot.GpsCoordinates = (2 * _singleChestRobot.GpsCoordinates.X, _singleChestRobot.GpsCoordinates.Y);
     }
 
-    private void MoveRobot(Robot robot)
+    private void ApplyMovements(Robot robot)
     {
         foreach (char movement in _movements)
         {

@@ -1,19 +1,15 @@
-﻿using System;
-using System.Text;
+﻿namespace AdventOfCode;
 
-namespace AdventOfCode;
-
-using static AdventOfCode.Day15;
 using Vector2i = (int X, int Y);
 
 public partial record Day15
 {
 
-    private readonly DoubleChestRobot _doubleChestRobot;
+    private readonly Robot _doubleChestRobot;
 
     public override void SolvePart2()
     {
-        MoveRobot(_doubleChestRobot);
+        ApplyMovements(_doubleChestRobot);
     }
 
     public class DoubleChestRobot(char[,] grid) : Robot(grid)
@@ -28,38 +24,45 @@ public partial record Day15
             return true;
         }
 
-        private void Move(IObjectPosition position, Vector2i delta)
+        private void Move(ObjectPosition position, Vector2i delta)
         {
             foreach (var obstruction in GetObstructions(position, delta))
             {
                 Move(obstruction, delta);
             }
 
-            foreach (var (X, Y) in position)
+            char[] chars = new char[position.Count()];
+
+            foreach (var (index, (x, y)) in position.Index())
             {
-                Vector2i moved = (X + delta.X, Y + delta.Y);
-                (Grid[moved.Y, moved.X], Grid[Y, X]) = (Grid[Y, X], Grid[moved.Y, moved.X]);
+                chars[index] = Grid[y, x];
+                Grid[y, x] = '.';
+            }
+
+            foreach (var (index, (x, y)) in position.Index())
+            {
+                Grid[y + delta.Y, x + delta.X] = chars[index];
             }
         }
 
-        private bool CanMove(IObjectPosition position, Vector2i delta)
+        private bool CanMove(ObjectPosition position, Vector2i delta)
         {
             return GetObstructions(position, delta)
-                .All(obstruction => obstruction is ChestPosition chest && CanMove(chest, delta));
+                .All(obstruction => obstruction is ChestPosition && CanMove(obstruction, delta));
         }
 
-        private HashSet<IObjectPosition> GetObstructions(IObjectPosition position, Vector2i delta)
+        private HashSet<ObjectPosition> GetObstructions(ObjectPosition position, Vector2i delta)
         {
             return position
                 .Select(value => (value.X + delta.X, value.Y + delta.Y))
                 .Select(GetObjectPosition)
                 .Where(objectPosition => objectPosition != null)
                 .Select(objectPosition => objectPosition!)
-                .Where(objectPosition => !objectPosition.SequenceEqual(position))
+                .Where(objectPosition => !objectPosition.Equals(position))
                 .ToHashSet();
         }
 
-        private IObjectPosition? GetObjectPosition(Vector2i position)
+        private ObjectPosition? GetObjectPosition(Vector2i position)
         {
             return Grid[position.Y, position.X] switch
             {

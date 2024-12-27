@@ -6,7 +6,7 @@ public partial record Day15
     public abstract class Robot(char[,] grid)
     {
 
-        protected internal char[,] Grid = grid;
+        protected internal readonly char[,] Grid = grid;
 
         protected internal (int X, int Y) GpsCoordinates;
         

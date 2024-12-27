@@ -19,14 +19,9 @@ public partial record Day23
         {
             unchecked
             {
-                int hash = 19;
-
-                foreach (var computer in this.ToImmutableSortedSet())
-                {
-                    hash = hash * 31 + computer.GetHashCode();
-                }
-
-                return hash;
+                return this
+                    .ToImmutableSortedSet()
+                    .Aggregate(19, (result, current) => result * 31 + current.GetHashCode());
             }
         }
 

@@ -1,4 +1,7 @@
 ﻿using System.Collections;
+using System.Text;
+
+using ILGPU.Runtime;
 
 namespace AdventOfCode;
 
@@ -7,38 +10,54 @@ using Vector2i = (int X, int Y);
 public partial record Day15
 {
 
-    public abstract class IObjectPosition : IEnumerable<Vector2i>
+    public abstract class ObjectPosition : IEnumerable<Vector2i>
     {
 
-        public abstract IEnumerator<(int X, int Y)> GetEnumerator();
+        public abstract IEnumerator<Vector2i> GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    }
+        public override string ToString() => $"[{string.Join(", ", this)}]";
 
-    public class ChestPosition(Vector2i left, Vector2i right) : IObjectPosition
-    {
-
-        public Vector2i Left { get; } = left;
-
-        public Vector2i Right { get; } = right;
-
-        public override IEnumerator<Vector2i> GetEnumerator()
+        public override bool Equals(object? obj)
         {
-            yield return Left;
-            yield return Right;
+            if (obj is not ObjectPosition position) return false;
+            return ReferenceEquals(this, position) || this.SequenceEqual(position);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = this.Aggregate(
+                new HashCode(),
+                (result, current) =>
+                {
+                    result.Add(current);
+                    return result;
+                }
+            );
+
+            return hashCode.ToHashCode();
         }
 
     }
 
-    public abstract class SinglePosition(Vector2i position) : IObjectPosition
+    public class ChestPosition(Vector2i left, Vector2i right) : ObjectPosition
     {
-
-        public Vector2i Value { get; } = position;
 
         public override IEnumerator<Vector2i> GetEnumerator()
         {
-            yield return Value;
+            yield return left;
+            yield return right;
+        }
+
+    }
+
+    public abstract class SinglePosition(Vector2i position) : ObjectPosition
+    {
+
+        public override IEnumerator<Vector2i> GetEnumerator()
+        {
+            yield return position;
         }
 
     }

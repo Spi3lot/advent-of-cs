@@ -3,11 +3,11 @@
 public partial record Day15
 {
 
-    private readonly SingleChestRobot _singleChestRobot;
+    private readonly Robot _singleChestRobot;
 
     public override void SolvePart1()
     {
-        MoveRobot(_singleChestRobot);
+        ApplyMovements(_singleChestRobot);
     }
 
     public class SingleChestRobot(char[,] grid) : Robot(grid)
