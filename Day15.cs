@@ -1,6 +1,4 @@
-﻿using ILGPU;
-
-namespace AdventOfCode;
+﻿namespace AdventOfCode;
 
 public partial record Day15 : AdventDay<Day15>
 {
