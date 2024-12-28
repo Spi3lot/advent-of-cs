@@ -1,14 +1,14 @@
 ﻿namespace AdventOfCode;
 
-public partial record Day23 : AdventDay<Day23>
+public partial record Day23
 {
 
     private readonly record struct Computer(string Name) : IComparable<Computer>
     {
 
-        public static readonly Dictionary<Computer, ISet<Computer>> Connections = [];
+        private static readonly Dictionary<Computer, Interconnection> Connections = [];
 
-        public readonly void ConnectTo(Computer that)
+        public void ConnectTo(Computer that)
         {
             if (Connections.TryGetValue(this, out var theseConnections))
             {
@@ -16,7 +16,7 @@ public partial record Day23 : AdventDay<Day23>
             }
             else
             {
-                HashSet<Computer> connections = [that];
+                Interconnection connections = [that];
                 Connections[this] = connections;
             }
 
@@ -26,7 +26,7 @@ public partial record Day23 : AdventDay<Day23>
             }
             else
             {
-                HashSet<Computer> connections = [this];
+                Interconnection connections = [this];
                 Connections[that] = connections;
             }
         }
@@ -54,10 +54,38 @@ public partial record Day23 : AdventDay<Day23>
             return interconnections;
         }
 
-        public readonly int CompareTo(Computer other)
+        public static IEnumerable<Interconnection> FindCliques()
         {
-            return Name.CompareTo(other.Name);
+            return BronKerbosch([], [..Connections.Keys], []);
         }
+
+        private static IEnumerable<Interconnection> BronKerbosch(
+            Interconnection r,
+            Interconnection p,
+            Interconnection x
+        )
+        {
+            if (p.Count <= 0 && x.Count <= 0) yield return r;
+
+            foreach (var v in p)
+            {
+                var cliques = BronKerbosch(
+                    [..r.Union([v])],
+                    [..p.Intersect(Connections[v])],
+                    [..x.Intersect(Connections[v])]
+                    );
+                
+                foreach (var clique in cliques) yield return clique;
+                p.Remove(v);
+                x.Add(v);
+            }
+        }
+
+        public int CompareTo(Computer other)
+        {
+            return string.CompareOrdinal(Name, other.Name);
+        }
+
     }
 
 }

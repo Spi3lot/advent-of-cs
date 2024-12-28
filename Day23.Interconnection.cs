@@ -19,10 +19,18 @@ public partial record Day23
         {
             unchecked
             {
-                return this
-                    .ToImmutableSortedSet()
-                    .Aggregate(19, (result, current) => result * 31 + current.GetHashCode());
+                return this.Aggregate(19, (result, current) => result * 31 + current.GetHashCode());
             }
+        }
+
+        public override string ToString()
+        {
+            return string.Join(',', this.Select(computer => computer.Name));
+        }
+
+        public new IEnumerator<Computer> GetEnumerator()
+        {
+            return this.ToImmutableSortedSet().GetEnumerator();
         }
 
     }
