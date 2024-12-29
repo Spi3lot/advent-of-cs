@@ -42,17 +42,17 @@ public partial record Day17 : AdventDay<Day17>
     public override void SolvePart2()
     {
         long a = 0;
-        
+
         for (int i = _program.Length - 1; i >= 0; i--)
         {
             a <<= 3;
-            
+
             while (!_program[i..].SequenceEqual(_computer.Execute(_instructions)))
             {
                 _computer['A'] = ++a;
             }
         }
-        
+
         Console.WriteLine(a);
     }
 

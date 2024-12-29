@@ -7,7 +7,8 @@ public partial record Day17
     {
 
         private static readonly Action<Computer, byte>[] Actions =
-        [   (computer, operand) => computer['A'] >>= Convert.ToInt32(computer.Combo(operand)),
+        [
+            (computer, operand) => computer['A'] >>= Convert.ToInt32(computer.Combo(operand)),
             (computer, operand) => computer['B'] ^= operand,
             (computer, operand) => computer['B'] = computer.Combo(operand) & 7,
             (computer, operand) => computer.Jnz(operand),
