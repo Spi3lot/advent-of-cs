@@ -16,34 +16,35 @@ public partial record Day21 : AdventDay<Day21>
 
     public override void SolvePart1()
     {
-        int sum = 0;
-
-        foreach (string code in _sequences)
-        {
-            Console.WriteLine(code);
-            string sequence = NumericKeyPad.GetSequenceForPressing(code);
-            Console.WriteLine(sequence);
-            sequence = DirectionalKeyPad.GetSequenceForPressing(sequence);
-            Console.WriteLine(sequence);
-            sequence = DirectionalKeyPad.GetSequenceForPressing(sequence);
-            Console.WriteLine(sequence);
-            sum += sequence.Length * int.Parse(code[..^1]);
-        }
-
-        Console.WriteLine(sum);
+        Console.WriteLine(SumSequenceComplexities(2));
     }
 
     public override void SolvePart2()
     {
-        string sequence = "<v<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A";
-        Console.WriteLine(sequence);
-        sequence = DirectionalKeyPad.Press(sequence);
-        Console.WriteLine(DirectionalKeyPad.GetSequenceForPressing(sequence)); // compare this 
-        Console.WriteLine(sequence); // to this, because then they are actually trying to type the same thing
-        sequence = DirectionalKeyPad.Press(sequence);
-        Console.WriteLine(sequence);
-        sequence = NumericKeyPad.Press(sequence);
-        Console.WriteLine(sequence);
+        Console.WriteLine(SumSequenceComplexities(25));
+    }
+
+    private long SumSequenceComplexities(int directionalRobotCount)
+    {
+        return _sequences.Sum(code => CalculateComplexity(code, directionalRobotCount));
+    }
+
+    private static long CalculateComplexity(string code, int directionalRobotCount)
+    {
+        string sequence = GetSequenceForTypingCode(code, directionalRobotCount);
+        return sequence.Length * int.Parse(code[..^1]);
+    }
+
+    private static string GetSequenceForTypingCode(string code, int directionalRobotCount)
+    {
+        string sequence = NumericKeyPad.GetSequenceForTyping(code);
+
+        for (int i = 0; i < directionalRobotCount; i++)
+        {
+            sequence = DirectionalKeyPad.GetSequenceForTyping(sequence);
+        }
+
+        return sequence;
     }
 
 }

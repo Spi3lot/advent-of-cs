@@ -5,3 +5,6 @@ dotnet_diagnostic.S3358.severity = suggestion
 
 # S2368: Public methods should not have multidimensional array parameters
 dotnet_diagnostic.S2368.severity = suggestion
+
+# S1144: Unused private types or members should be removed
+dotnet_diagnostic.S1144.severity = none
