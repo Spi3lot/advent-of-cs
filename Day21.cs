@@ -32,7 +32,7 @@ public partial record Day21 : AdventDay<Day21>
     private static long CalculateComplexity(string code, int directionalRobotCount)
     {
         string sequence = GetSequenceForTypingCode(code, directionalRobotCount);
-        return sequence.Length * int.Parse(code[..^1]);
+        return sequence.Length * long.Parse(code[..^1]);
     }
 
     private static string GetSequenceForTypingCode(string code, int directionalRobotCount)

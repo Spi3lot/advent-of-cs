@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace AdventOfCode;
+﻿namespace AdventOfCode;
 
 using Buttons = ((long X, long Y, long Cost) A, (long X, long Y, long Cost) B);
 using ButtonPressCount = (long Value, long Numerator, long Denominator);

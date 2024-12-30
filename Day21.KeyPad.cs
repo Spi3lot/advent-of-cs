@@ -51,7 +51,7 @@ public partial record Day21
 
         public string GetSequenceForTyping(string sequence)
         {
-            var stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder(sequence.Length);
             var previousPosition = _positions['A'];
 
             foreach (var position in sequence.Select(key => _positions[key]))
@@ -63,57 +63,53 @@ public partial record Day21
             return stringBuilder.ToString();
         }
 
-        /// <summary>
-        /// 
-        /// ALWAYS TRAVEL FURTHEST (<) FIRST
-        /// AND ^ BEFORE > BECAUSE ^ IS < OF A
-        ///                    BUT > IS v OF A
-        /// 
-        /// <v   A
-        /// v<<A>A   ^>A
-        /// <vA<AA>>^AvA^A   <Av>A^A
-        /// 
-        /// is better than
-        /// 
-        /// v<   A
-        /// <vA<A>>   ^A
-        /// v<<A>A^>Av<<A>>^AvAA   <^A>A
-        /// 
-        /// and even better (judging by applied rules rather than sequence length) than
-        /// 
-        /// v<   A
-        /// v<A<A   >>^A
-        /// v<A<A>>^Av<<A>>^A   vAA^<A>A
-        /// 
-        /// 
-        /// 
-        /// v>   A
-        /// <vA>A  ^A
-        /// v<<A>A^>AvA^A  <A>A
-        /// 
-        /// is better than
-        /// 
-        /// >v   A
-        /// vA<A   >^A
-        /// v<A>^Av<<A>>^A   vA^<A>A 
-        /// 
-        /// 
-        /// 
-        /// ^>   A
-        /// <Av>   A   ^A
-        /// v<<A>>^A<vA>   A   ^A   <A>A
-        /// <vA<AA>>^AvAA<^A>Av<<A>A^>Av   A   ^A   <A>A   v<<A>>^AvA^A
-        ///  v<<A>A^>Av<<A>>^AAvAA<^A>A<vA^>AAv<<A>^A>AvA^A<vA<AA>>^AvA^A<Av>A^A<v   A   ^>A   <A>A   v<<A>>^AvA^A   <vA<AA>>^AvAA<^A>A<vA^>A<A>A
-        /// 
-        /// is better than
-        /// 
-        /// >^   A
-        /// vA<^   A   >A
-        /// <vA>^Av<<A>^   A   >A   vA^A
-        /// v<<A>A>^AvA<^A>A<vA<AA>>^AvA   <^A   >A   vA^A   <vA>^A<A>A
-        ///  <vA<AA>>^AvA^AvA<^A>A<vA>^Av<<A>^A>AvA^Av<<A>A>^Av<<A>>^AAvAA<^A>A<vA>^   A   v<<A>^A>A   vA^A   <vA>^A<A>A   v<<A>A>^AvA<^A>Av<<A>>^AvA^A
-        /// 
-        /// </summary>
+        // ALWAYS TRAVEL FURTHEST (<) FIRST
+        // AND ^ BEFORE > BECAUSE ^ IS < OF A
+        //                    BUT > IS v OF A
+        // 
+        // <v   A
+        // v<<A>A   ^>A
+        // <vA<AA>>^AvA^A   <Av>A^A
+        // 
+        // is better than
+        // 
+        // v<   A
+        // <vA<A>>   ^A
+        // v<<A>A^>Av<<A>>^AvAA   <^A>A
+        // 
+        // and even better (judging by applied rules rather than sequence length) than
+        // 
+        // v<   A
+        // v<A<A   >>^A
+        // v<A<A>>^Av<<A>>^A   vAA^<A>A
+        // 
+        // 
+        // 
+        // v>   A
+        // <vA>A  ^A
+        // v<<A>A^>AvA^A  <A>A
+        // 
+        // is better than
+        // 
+        // >v   A
+        // vA<A   >^A
+        // v<A>^Av<<A>>^A   vA^<A>A 
+        // 
+        // 
+        // 
+        // ^>   A
+        // <Av>   A   ^A
+        // v<<A>>^A<vA>   A   ^A   <A>A
+        // <vA<AA>>^AvAA<^A>Av<<A>A^>Av   A   ^A   <A>A   v<<A>>^AvA^A
+        //  v<<A>A^>Av<<A>>^AAvAA<^A>A<vA^>AAv<<A>^A>AvA^A<vA<AA>>^AvA^A<Av>A^A<v   A   ^>A   <A>A   v<<A>>^AvA^A   <vA<AA>>^AvAA<^A>A<vA^>A<A>A
+        // 
+        // is better than
+        // 
+        // >^   A
+        // vA<^   A   >A
+        // <vA>^Av<<A>^   A   >A   vA^A
+        // v<<A>A>^AvA<^A>A<vA<AA>>^AvA   <^A   >A   vA^A   <vA>^A<A>A
+        //  <vA<AA>>^AvA^AvA<^A>A<vA>^Av<<A>^A>AvA^Av<<A>A>^Av<<A>>^AAvAA<^A>A<vA>^   A   v<<A>^A>A   vA^A   <vA>^A<A>A   v<<A>A>^AvA<^A>Av<<A>>^AvA^A
         private string GetSequenceForDelta((int X, int Y) from, (int X, int Y) to)
         {
             (int X, int Y) delta = (to.X - from.X, to.Y - from.Y);
