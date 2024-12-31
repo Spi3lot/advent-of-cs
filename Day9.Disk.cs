@@ -80,10 +80,7 @@ public partial record Day9
             {
                 while (_blocks[i] != null) i++;
                 while (_blocks[j] == null) j--;
-
-                if (i > j)
-                    break; // At this place, i and j can never be equal so > is sufficient. If i or j were out of bounds, an exception would have been thrown already
-
+                if (i > j) break; // At this place, i and j can never be equal so > is sufficient. If i or j were out of bounds, an exception would have been thrown already
                 _blocks[i] = _blocks[j];
                 _blocks[j] = null;
             }

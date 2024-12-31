@@ -1,18 +1,7 @@
-﻿using System.Runtime.Serialization;
+﻿namespace AdventOfCode;
 
-namespace AdventOfCode;
-
-public record Day24 : AdventDay<Day24>
+public partial record Day24 : AdventDay<Day24>
 {
-
-    private static readonly Dictionary<string, Func<bool, bool, bool>> Operators = new()
-    {
-        ["XOR"] = (a, b) => a ^ b,
-        ["AND"] = (a, b) => a && b,
-        ["OR"] = (a, b) => a || b,
-    };
-
-    private readonly Dictionary<string, Func<bool>> _wires = [];
 
     public Day24()
     {
@@ -24,57 +13,56 @@ public record Day24 : AdventDay<Day24>
         {
             string[] parts = initialization.Split(": ");
             string name = parts[0];
-            bool value = parts[1][0] == '1';
-            _wires[name] = () => value;
+            Wire.Connect(name, ConstantWire.Parse(parts[1], null));
         }
 
-        foreach (string gate in gates)
+        foreach (string gateString in gates)
         {
-            string operatorName = DetermineOperator(gate);
-            string[] parts = gate.Split(" -> ");
-            string[] inputNames = parts[0].Split($" {operatorName} ");
+            string[] parts = gateString.Split(" -> ");
             string outputName = parts[1];
-            var @operator = Operators[operatorName];
-            _wires[outputName] = () => @operator(_wires[inputNames[0]](), _wires[inputNames[1]]());
+            Wire.Connect(outputName, LogicGate.Parse(parts[0], null));
         }
     }
 
     public override void SolvePart1()
     {
-        Console.WriteLine(GetValueForVariable('z'));
+        Console.WriteLine(Wire.GetValueForVariable('z'));
     }
 
     public override void SolvePart2()
     {
-        ulong x = GetValueForVariable('x');
-        ulong y = GetValueForVariable('y');
-        ulong z = GetValueForVariable('z');
-        Console.WriteLine($"x = {x}");
-        Console.WriteLine($"y = {y}");
-        Console.WriteLine($"x + y = {x + y}");
-        Console.WriteLine($"z = {z}");
-    }
+        var wireDepths = Wire.Wires.ToLookup(wire => wire.Value.Depth);
 
-    private static string DetermineOperator(string gate)
-    {
-        return Operators.Keys.First(gate.Contains);
-    }
+        var depths = from wire in wireDepths
+                     let depth = wire.Key
+                     orderby depth
+                     select depth;
 
-    private ulong GetValueForVariable(char variableName)
-    {
-        ulong variable = 0;
+        var enumerators = (from depth in depths
+                           let wireDepth = wireDepths[depth]
+                           select wireDepth.GetEnumerator())
+                           .ToList();
 
-        for (int i = 0; _wires.TryGetValue(GetWireNameForBit(variableName, i), out var func); i++)
+        IEnumerable<bool> haveNext = enumerators.Select(_ => true);
+
+        while ((haveNext = MoveAllNext(enumerators, haveNext)).Any(hasNext => hasNext))
         {
-            if (func()) variable |= 1uL << i;
+            foreach (var (enumerator, hasNext) in enumerators.Zip(haveNext))
+            {
+                Console.Write((hasNext) ? $"{enumerator.Current.Key,-4}" : "    ");
+            }
         }
-
-        return variable;
     }
 
-    private static string GetWireNameForBit(char variableName, int bit)
+    private static IEnumerable<bool> MoveAllNext<T>(
+        IEnumerable<IEnumerator<T>> enumerators,
+        IEnumerable<bool> didHaveNext
+    )
     {
-        return $"{variableName}{((bit < 10) ? "0" : "")}{bit}";
+        foreach (var (enumerator, hadNext) in enumerators.Zip(didHaveNext))
+        {
+            yield return hadNext && enumerator.MoveNext();
+        }
     }
 
 }
