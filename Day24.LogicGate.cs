@@ -17,7 +17,7 @@ public partial record Day24
 
         private readonly Func<bool, bool, bool> _operator = Operators[type];
 
-        public override bool Value => _operator(Wires[input1].Value, Wires[input2].Value);
+        public override bool Output => _operator(Wires[input1].Output, Wires[input2].Output);
 
         public override int Depth => 1 + Math.Min(Wires[input1].Depth, Wires[input2].Depth);
 

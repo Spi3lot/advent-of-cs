@@ -16,9 +16,9 @@ public partial record Day24 : AdventDay<Day24>
             Wire.Connect(name, ConstantWire.Parse(parts[1], null));
         }
 
-        foreach (string gateString in gates)
+        foreach (string gate in gates)
         {
-            string[] parts = gateString.Split(" -> ");
+            string[] parts = gate.Split(" -> ");
             string outputName = parts[1];
             Wire.Connect(outputName, LogicGate.Parse(parts[0], null));
         }
@@ -34,18 +34,18 @@ public partial record Day24 : AdventDay<Day24>
         var wireDepths = Wire.Wires.ToLookup(wire => wire.Value.Depth);
 
         var depths = from wire in wireDepths
-                     let depth = wire.Key
-                     orderby depth
-                     select depth;
+            let depth = wire.Key
+            orderby depth
+            select depth;
 
         var enumerators = (from depth in depths
-                           let wireDepth = wireDepths[depth]
-                           select wireDepth.GetEnumerator())
-                           .ToList();
+                let wireDepth = wireDepths[depth]
+                select wireDepth.GetEnumerator())
+            .ToList();
 
-        IEnumerable<bool> haveNext = enumerators.Select(_ => true);
+        var haveNext = enumerators.Select(_ => true);
 
-        while ((haveNext = MoveAllNext(enumerators, haveNext)).Any(hasNext => hasNext))
+        while ((haveNext = MoveAllNext(enumerators, haveNext).ToList()).Any(hasNext => hasNext))
         {
             foreach (var (enumerator, hasNext) in enumerators.Zip(haveNext))
             {
@@ -61,7 +61,10 @@ public partial record Day24 : AdventDay<Day24>
     {
         foreach (var (enumerator, hadNext) in enumerators.Zip(didHaveNext))
         {
-            yield return hadNext && enumerator.MoveNext();
+            if (!hadNext) yield return false;
+            if (enumerator.MoveNext()) yield return true;
+            enumerator.Dispose();
+            yield return false;
         }
     }
 

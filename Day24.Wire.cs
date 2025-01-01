@@ -8,7 +8,7 @@ public partial record Day24
     private abstract class Wire
     {
 
-        public abstract bool Value { get; }
+        public abstract bool Output { get; }
 
         public abstract int Depth { get; }
 
@@ -22,7 +22,7 @@ public partial record Day24
 
             for (byte i = 0; TryGetWireForBit(variableName, i, out var wire); i++)
             {
-                if (wire.Value) variable |= 1uL << i;
+                if (wire.Output) variable |= 1uL << i;
             }
 
             return variable;
@@ -36,7 +36,6 @@ public partial record Day24
         {
             return Wires.TryGetValue(GetWireNameForBit(variableName, bit), out wire);
         }
-
 
         public static Wire GetWireForBit(char variableName, byte bit)
         {

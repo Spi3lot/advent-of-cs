@@ -8,7 +8,7 @@ public partial record Day24
     private sealed class ConstantWire(bool value) : Wire, IParsable<ConstantWire>
     {
 
-        public override bool Value => value;
+        public override bool Output => value;
 
         public override int Depth => 0;
 
