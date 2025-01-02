@@ -34,14 +34,14 @@ public partial record Day24 : AdventDay<Day24>
         var wireDepths = Wire.Wires.ToLookup(wire => wire.Value.Depth);
 
         var depths = from wire in wireDepths
-            let depth = wire.Key
-            orderby depth
-            select depth;
+                     let depth = wire.Key
+                     orderby depth
+                     select depth;
 
         var enumerators = (from depth in depths
-                let wireDepth = wireDepths[depth]
-                select wireDepth.GetEnumerator())
-            .ToList();
+                           let wireDepth = wireDepths[depth]
+                           select wireDepth.GetEnumerator())
+                           .ToList();
 
         var haveNext = enumerators.Select(_ => true);
 
@@ -51,6 +51,8 @@ public partial record Day24 : AdventDay<Day24>
             {
                 Console.Write((hasNext) ? $"{enumerator.Current.Key,-4}" : "    ");
             }
+
+            Console.WriteLine();
         }
     }
 
@@ -61,8 +63,8 @@ public partial record Day24 : AdventDay<Day24>
     {
         foreach (var (enumerator, hadNext) in enumerators.Zip(didHaveNext))
         {
-            if (!hadNext) yield return false;
-            if (enumerator.MoveNext()) yield return true;
+            if (!hadNext) { yield return false; continue; }
+            if (enumerator.MoveNext()) { yield return true; continue; }
             enumerator.Dispose();
             yield return false;
         }

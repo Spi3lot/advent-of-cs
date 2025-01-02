@@ -19,7 +19,7 @@ public partial record Day24
 
         public override bool Output => _operator(Wires[input1].Output, Wires[input2].Output);
 
-        public override int Depth => 1 + Math.Min(Wires[input1].Depth, Wires[input2].Depth);
+        public override int Depth => 1 + Math.Max(Wires[input1].Depth, Wires[input2].Depth);
 
         public static LogicGate Parse(string s, IFormatProvider? provider)
         {
