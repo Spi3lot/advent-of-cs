@@ -1,20 +1,18 @@
 ﻿namespace AdventOfCode;
 
-public record Day22 : AdventDay<Day22>
+public partial record Day22 : AdventDay<Day22>
 {
 
-    public override void SolvePart1()
-    {
-        ulong sum = Input.Split("\n")
-            .Where(line => !string.IsNullOrWhiteSpace(line))
-            .Select(ulong.Parse)
-            .Select(initialSecret => NthSecret(initialSecret, 2000))
-            .Aggregate(0uL, ((accumulate, secret) => accumulate + secret));
-        
-        Console.WriteLine(sum);
-    }
+    private const int N = 2000;
 
-    public override void SolvePart2() { }
+    private readonly ulong[] _initialSecrets;
+
+    public Day22()
+    {
+        _initialSecrets = [.. from line in Input.Split("\n")
+                              where !string.IsNullOrWhiteSpace(line)
+                              select ulong.Parse(line)];
+    }
 
     private static ulong NthSecret(ulong initialSecret, ulong n)
     {
