@@ -7,48 +7,46 @@ public partial record Day22
 
     public override void SolvePart2()
     {
-        Dictionary<int, int> revenues = [];
         byte[,] bananaAmounts = GenerateBananaAmounts();
         var currentDifferences = new DifferenceBuffer(DifferenceBufferLength);
-        int impossibleCount = 0;
-
-        for (int j = 0; j < bananaAmounts.GetLength(0); j++)
-        {
-            for (int i = 1; i < bananaAmounts.GetLength(1); i++)
-            {
-                currentDifferences.Shift(bananaAmounts[j, i] - bananaAmounts[j, i - 1]);
-                if (i > DifferenceBufferLength) revenues[currentDifferences.Base19Representation] = 0;
-            }
-        }
+        var revenues = FillRevenueKeys(bananaAmounts, currentDifferences);
+        int count = 0;
 
         foreach (int base19 in revenues.Keys)
         {
-            if (!DifferenceBuffer.FromBase19(base19, DifferenceBufferLength).IsPossible())
-            {
-                impossibleCount++; continue;
-            }
-
             for (int j = 0; j < bananaAmounts.GetLength(0); j++)
             {
                 for (int i = 1; i < bananaAmounts.GetLength(1); i++)
                 {
                     currentDifferences.Shift(bananaAmounts[j, i] - bananaAmounts[j, i - 1]);
-
-                    if (i > DifferenceBufferLength && currentDifferences.Base19Representation == base19)
-                    {
-                        revenues[base19] += bananaAmounts[j, i];
-                    }
+                    if (count <= DifferenceBufferLength || currentDifferences.Base19Representation != base19) continue;
+                    revenues[base19] += bananaAmounts[j, i];
+                    break;
                 }
             }
 
-            if (base19 % 100 == 0) Console.WriteLine(base19);
+            if (count++ % 10 == 0) Console.WriteLine((double) count / revenues.Count);
         }
 
-        Console.WriteLine(string.Join(',', revenues));
-        Console.WriteLine(impossibleCount);
-        Console.WriteLine(revenues.Count);
-        Console.WriteLine(Math.Pow(19, 4) - revenues.Count);
-        Console.WriteLine(revenues.Values.Max());
+        var max = revenues.MaxBy(pair => pair.Value);
+        Console.WriteLine(string.Join(", ", DifferenceBuffer.FromBase19(max.Key, DifferenceBufferLength).Differences));
+        Console.WriteLine(max.Value);
+    }
+
+    private static Dictionary<int, int> FillRevenueKeys(byte[,] bananaAmounts, DifferenceBuffer differences)
+    {
+        Dictionary<int, int> revenues = [];
+
+        for (int j = 0; j < bananaAmounts.GetLength(0); j++)
+        {
+            for (int i = 1; i < bananaAmounts.GetLength(1); i++)
+            {
+                differences.Shift(bananaAmounts[j, i] - bananaAmounts[j, i - 1]);
+                if (i > DifferenceBufferLength) revenues[differences.Base19Representation] = 0;
+            }
+        }
+
+        return revenues;
     }
 
     private byte[,] GenerateBananaAmounts()
@@ -61,7 +59,7 @@ public partial record Day22
 
             for (int i = 0; i <= N; i++)
             {
-                bananaAmounts[buyerIndex, i] = (byte)(secret % 10);
+                bananaAmounts[buyerIndex, i] = (byte) (secret % 10);
                 secret = NextSecret(secret);
             }
         }

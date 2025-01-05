@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode;
 
-public partial record Day22 : AdventDay<Day22>
+public partial record Day22
 {
 
     public override void SolvePart1()

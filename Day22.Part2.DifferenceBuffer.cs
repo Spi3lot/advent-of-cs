@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace AdventOfCode;
+﻿namespace AdventOfCode;
 
 public partial record Day22
 {
@@ -8,9 +6,7 @@ public partial record Day22
     private sealed class DifferenceBuffer(int length)
     {
 
-        private readonly int[] _differences = new int[length];
-
-        public int Length => length;
+        public int[] Differences { get; } = new int[length];
 
         public int Base19Representation { get; private set; }
 
@@ -22,7 +18,7 @@ public partial record Day22
             for (int i = 0; i < length; i++)
             {
                 division = Math.DivRem(division.Quotient, 19);
-                buffer._differences[i] = division.Remainder - 9;
+                buffer.Differences[i] = division.Remainder - 9;
             }
 
             return buffer;
@@ -30,12 +26,12 @@ public partial record Day22
 
         public void Shift(int newDifference)
         {
-            for (int i = 0; i < _differences.Length - 1; i++)
+            for (int i = 0; i < Differences.Length - 1; i++)
             {
-                _differences[i] = _differences[i + 1];
+                Differences[i] = Differences[i + 1];
             }
 
-            _differences[^1] = newDifference;
+            Differences[^1] = newDifference;
             Base19Representation = ToBase19();
         }
 
@@ -44,32 +40,13 @@ public partial record Day22
             int result = 0;
             int factor = 1;
 
-            foreach (int n in from d in _differences select d + 9)
+            foreach (int difference in Differences)
             {
-                result += (n + 9) * factor;
+                result += (difference + 9) * factor;
                 factor *= 19;
             }
 
             return result;
-        }
-
-        public bool IsPossible()
-        {
-            return Enumerable.Range(0, 10).Any(IsPossibleWithInitialBananaAmount);
-        }
-
-        public bool IsPossibleWithInitialBananaAmount([Range(0, 10)] int bananaAmount)
-        {
-            ArgumentOutOfRangeException.ThrowIfLessThan(bananaAmount, 0);
-            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(bananaAmount, 10);
-
-            foreach (int difference in _differences)
-            {
-                bananaAmount += difference;
-                if (bananaAmount < 0 || bananaAmount >= 10) return false;
-            }
-
-            return true;
         }
 
     }
