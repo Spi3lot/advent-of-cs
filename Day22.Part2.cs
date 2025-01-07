@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode;
+﻿using System;
+
+namespace AdventOfCode;
 
 public partial record Day22
 {
@@ -19,17 +21,27 @@ public partial record Day22
                 for (int i = 1; i < bananaAmounts.GetLength(1); i++)
                 {
                     currentDifferences.Shift(bananaAmounts[j, i] - bananaAmounts[j, i - 1]);
-                    if (count <= DifferenceBufferLength || currentDifferences.Base19Representation != base19) continue;
-                    revenues[base19] += bananaAmounts[j, i];
-                    break;
+
+                    if (count >= DifferenceBufferLength && currentDifferences.Base19Representation == base19)
+                    {
+                        revenues[base19] += bananaAmounts[j, i];
+                        break;
+                    }
                 }
             }
 
-            if (count++ % 10 == 0) Console.WriteLine((double) count / revenues.Count);
+            if (count++ % 100 == 0) Console.WriteLine((double) count / revenues.Count);
         }
 
         var max = revenues.MaxBy(pair => pair.Value);
-        Console.WriteLine(string.Join(", ", DifferenceBuffer.FromBase19(max.Key, DifferenceBufferLength).Differences));
+        var maxBuffer = DifferenceBuffer.FromBase19(max.Key, DifferenceBufferLength);
+
+        for (int i = 0; i < DifferenceBufferLength; i++)
+        {
+            Console.Write($"{maxBuffer[i]} ");
+        }
+
+        Console.WriteLine();
         Console.WriteLine(max.Value);
     }
 

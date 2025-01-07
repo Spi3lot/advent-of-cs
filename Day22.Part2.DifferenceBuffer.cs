@@ -6,9 +6,15 @@ public partial record Day22
     private sealed class DifferenceBuffer(int length)
     {
 
-        public int[] Differences { get; } = new int[length];
+        private readonly int _maxFactor = Convert.ToInt32(Math.Pow(19, length - 1));
+
+        private readonly int[] _differences = new int[length];
+
+        private int _startIndex = 0;
 
         public int Base19Representation { get; private set; }
+
+        public int this[int index] => _differences[ShiftedIndex(index)];
 
         public static DifferenceBuffer FromBase19(int base19, int length)
         {
@@ -18,7 +24,7 @@ public partial record Day22
             for (int i = 0; i < length; i++)
             {
                 division = Math.DivRem(division.Quotient, 19);
-                buffer.Differences[i] = division.Remainder - 9;
+                buffer._differences[i] = division.Remainder - 9;
             }
 
             return buffer;
@@ -26,28 +32,12 @@ public partial record Day22
 
         public void Shift(int newDifference)
         {
-            for (int i = 0; i < Differences.Length - 1; i++)
-            {
-                Differences[i] = Differences[i + 1];
-            }
-
-            Differences[^1] = newDifference;
-            Base19Representation = ToBase19();
+            _differences[_startIndex] = newDifference;
+            _startIndex = ShiftedIndex(1);
+            Base19Representation = Base19Representation / 19 + newDifference * _maxFactor;
         }
 
-        private int ToBase19()
-        {
-            int result = 0;
-            int factor = 1;
-
-            foreach (int difference in Differences)
-            {
-                result += (difference + 9) * factor;
-                factor *= 19;
-            }
-
-            return result;
-        }
+        private int ShiftedIndex(int index) => (_startIndex + index) % _differences.Length;
 
     }
 
