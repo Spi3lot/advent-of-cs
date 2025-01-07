@@ -6,9 +6,11 @@ public partial record Day22
     private sealed class DifferenceBuffer(int length)
     {
 
-        private readonly int _maxFactor = Convert.ToInt32(Math.Pow(19, length - 1));
-
         private readonly sbyte[] _differences = new sbyte[length];
+
+        private readonly int _maxDigitFactor = Convert.ToInt32(Math.Pow(19, length - 1));
+
+        public readonly int CombinationCount = Convert.ToInt32(Math.Pow(19, length));
 
         private int _startIndex;
 
@@ -19,7 +21,7 @@ public partial record Day22
         public static DifferenceBuffer FromBase19(int base19, int length)
         {
             var buffer = new DifferenceBuffer(length) { Base19 = base19 };
-            var division = Math.DivRem(base19, 1);
+            var division = (Quotient: base19, Remainder: 0);
 
             for (int i = 0; i < length; i++)
             {
@@ -34,7 +36,7 @@ public partial record Day22
         {
             _differences[_startIndex] = (sbyte) newDifference;
             _startIndex = ShiftedIndex(1);
-            Base19 = Base19 / 19 + (newDifference + 9) * _maxFactor;
+            Base19 = Base19 / 19 + (newDifference + 9) * _maxDigitFactor;
         }
 
         private int ShiftedIndex(int index) => (_startIndex + index) % _differences.Length;
