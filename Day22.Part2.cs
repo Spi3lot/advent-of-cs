@@ -11,26 +11,28 @@ public partial record Day22
     {
         byte[,] bananaAmounts = GenerateBananaAmounts();
         var currentDifferences = new DifferenceBuffer(DifferenceBufferLength);
-        var revenues = FillRevenueKeys(bananaAmounts, currentDifferences);
-        int count = 0;
+
+        var revenues = FillRevenueKeysAndDifferences(
+            currentDifferences,
+            bananaAmounts,
+            out sbyte[,] differences
+        );
 
         foreach (int base19 in revenues.Keys)
         {
-            for (int j = 0; j < bananaAmounts.GetLength(0); j++)
+            for (int j = 0; j < differences.GetLength(0); j++)
             {
-                for (int i = 1; i < bananaAmounts.GetLength(1); i++)
+                for (int i = 0; i < differences.GetLength(1); i++)
                 {
-                    currentDifferences.Shift(bananaAmounts[j, i] - bananaAmounts[j, i - 1]);
+                    currentDifferences.Shift(differences[j, i]);
 
-                    if (count >= DifferenceBufferLength && currentDifferences.Base19Representation == base19)
+                    if (currentDifferences.Base19 == base19 && i + 1 >= DifferenceBufferLength)
                     {
-                        revenues[base19] += bananaAmounts[j, i];
+                        revenues[base19] += bananaAmounts[j, i + 1];
                         break;
                     }
                 }
             }
-
-            if (count++ % 100 == 0) Console.WriteLine((double) count / revenues.Count);
         }
 
         var max = revenues.MaxBy(pair => pair.Value);
@@ -38,27 +40,11 @@ public partial record Day22
 
         for (int i = 0; i < DifferenceBufferLength; i++)
         {
-            Console.Write($"{maxBuffer[i]} ");
+            Console.Write($"{maxBuffer[i]} "); // 1 -1 0 1
         }
 
         Console.WriteLine();
-        Console.WriteLine(max.Value);
-    }
-
-    private static Dictionary<int, int> FillRevenueKeys(byte[,] bananaAmounts, DifferenceBuffer differences)
-    {
-        Dictionary<int, int> revenues = [];
-
-        for (int j = 0; j < bananaAmounts.GetLength(0); j++)
-        {
-            for (int i = 1; i < bananaAmounts.GetLength(1); i++)
-            {
-                differences.Shift(bananaAmounts[j, i] - bananaAmounts[j, i - 1]);
-                if (i > DifferenceBufferLength) revenues[differences.Base19Representation] = 0;
-            }
-        }
-
-        return revenues;
+        Console.WriteLine(max.Value); // 1490; Took only 3016,9640234s
     }
 
     private byte[,] GenerateBananaAmounts()
@@ -77,6 +63,33 @@ public partial record Day22
         }
 
         return bananaAmounts;
+    }
+
+    private static Dictionary<int, int> FillRevenueKeysAndDifferences(
+        DifferenceBuffer buffer,
+        byte[,] bananaAmounts,
+        out sbyte[,] differences
+    )
+    {
+        Dictionary<int, int> revenues = [];
+
+        differences = new sbyte[
+            bananaAmounts.GetLength(0),
+            bananaAmounts.GetLength(1) - 1
+        ];
+
+        for (int j = 0; j < differences.GetLength(0); j++)
+        {
+            for (int i = 0; i < differences.GetLength(1); i++)
+            {
+                sbyte difference = (sbyte) (bananaAmounts[j, i + 1] - bananaAmounts[j, i]);
+                differences[j, i] = difference;
+                buffer.Shift(difference);
+                if (i + 1 >= DifferenceBufferLength) revenues[buffer.Base19] = 0;
+            }
+        }
+
+        return revenues;
     }
 
 }
