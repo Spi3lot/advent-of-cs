@@ -20,7 +20,7 @@ public partial record Day22
             {
                 currentDifferences.Shift(bananaAmounts[j, i] - bananaAmounts[j, i - 1]);
 
-                if (encounteredDifferences.Add(currentDifferences.Base19) && i >= DifferenceBufferLength)
+                if (i >= DifferenceBufferLength && encounteredDifferences.Add(currentDifferences.Base19))
                 {
                     revenues[currentDifferences.Base19] += bananaAmounts[j, i];
                 }
@@ -36,7 +36,7 @@ public partial record Day22
         }
 
         Console.WriteLine();
-        Console.WriteLine(max.Item); // ~3017s / ~0,14s = 21550x speedup
+        Console.WriteLine(max.Item); // ~3017s~ / 0,14s ~= 21550x speedup
     }
 
     private byte[,] GenerateBananaAmounts()
