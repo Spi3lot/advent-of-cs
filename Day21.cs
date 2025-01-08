@@ -21,7 +21,7 @@ public partial record Day21 : AdventDay<Day21>
 
     public override void SolvePart2()
     {
-        Console.WriteLine(SumSequenceComplexities(25));
+        Console.WriteLine(SumSequenceComplexities(19));
     }
 
     private long SumSequenceComplexities(int directionalRobotCount)

@@ -8,6 +8,8 @@ public partial record Day21
     private sealed class KeyPad
     {
 
+        private readonly Dictionary<string, Dictionary<string, long>> _superSequenceSubSequenceCounts = [];
+
         private readonly Dictionary<(char From, char To), string> _sequences = [];
 
         private readonly Dictionary<char, (int X, int Y)> _positions = [];
@@ -35,7 +37,20 @@ public partial record Day21
             {
                 foreach (var to in _positions)
                 {
-                    _sequences[(from.Key, to.Key)] = GetSequenceForDelta(from.Value, to.Value);
+                    string sequence = GetSequenceForDelta(from.Value, to.Value);
+                    _sequences[(from.Key, to.Key)] = sequence;
+                }
+            }
+
+            foreach (string sequence in _sequences.Values)
+            {
+                var counts = new Dictionary<string, long>();
+                _superSequenceSubSequenceCounts[sequence] = counts;
+
+                foreach (var (fromKey, toKey) in sequence[..^1].Zip(sequence[1..]))
+                {
+                    string parentSequence = _sequences[(fromKey, toKey)];
+                    counts[parentSequence] = 1 + counts.GetValueOrDefault(parentSequence, 0);
                 }
             }
         }
@@ -119,10 +134,10 @@ public partial record Day21
                     (0, 0) => stringBuilder,
                     (not 0, 0) => AppendHorizontal(delta.X, stringBuilder),
                     (0, not 0) => AppendVertical(delta.Y, stringBuilder),
-                    ( < 0, < 0) => stringBuilder.Append('<', -delta.X).Append('^', -delta.Y), // ^ is closer to A than <
-                    ( < 0, > 0) => stringBuilder.Append('<', -delta.X).Append('v', delta.Y), // v is closer to A than <
-                    ( > 0, < 0) => stringBuilder.Append('^', -delta.Y).Append('>', delta.X), // > is as close to A as ^
-                    ( > 0, > 0) => stringBuilder.Append('v', delta.Y).Append('>', delta.X), // > is closer to A than v
+                    (< 0, < 0) => stringBuilder.Append('<', -delta.X).Append('^', -delta.Y), // ^ is closer to A than <
+                    (< 0, > 0) => stringBuilder.Append('<', -delta.X).Append('v', delta.Y), // v is closer to A than <
+                    (> 0, < 0) => stringBuilder.Append('^', -delta.Y).Append('>', delta.X), // > is as close to A as ^
+                    (> 0, > 0) => stringBuilder.Append('v', delta.Y).Append('>', delta.X), // > is closer to A than v
                 };
             }
 
@@ -138,7 +153,8 @@ public partial record Day21
             {
                 _ = key switch
                 {
-                    'A' => stringBuilder.Append(_layout[y][x]).Length,  // .Length just so that an int is returned... ugly but better than useless delegate allocations
+                    'A' => stringBuilder.Append(_layout[y][x])
+                        .Length, // .Length just so that an int is returned... ugly but better than useless delegate allocations
                     '<' => x--,
                     '>' => x++,
                     '^' => y--,
@@ -155,7 +171,7 @@ public partial record Day21
             var stringBuilder = new StringBuilder(sequence.Length);
             char previousKey = 'A';
 
-            foreach (var key in sequence)
+            foreach (char key in sequence)
             {
                 stringBuilder.Append(_sequences[(previousKey, key)]);
                 previousKey = key;
@@ -180,7 +196,7 @@ public partial record Day21
         private void FillSequenceCountsForTyping(
             string sequence,
             int remainingRobotCount,
-            Dictionary<string, long> sequenceCounts
+            Dictionary<string, long> sequenceCounts  // todo: remove?
         )
         {
             if (remainingRobotCount == 0)
