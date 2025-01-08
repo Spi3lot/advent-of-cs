@@ -8,6 +8,8 @@ public partial record Day21
     private sealed class KeyPad
     {
 
+        private readonly Dictionary<(char From, char To), string> _sequences = [];
+
         private readonly Dictionary<char, (int X, int Y)> _positions = [];
 
         private readonly (int X, int Y) _gapPosition;
@@ -16,6 +18,8 @@ public partial record Day21
 
         public KeyPad(params string[] layout)
         {
+            _layout = layout;
+
             foreach (var (j, line) in layout.Index())
             {
                 foreach (var (i, key) in line.Index())
@@ -25,42 +29,25 @@ public partial record Day21
             }
 
             _gapPosition = _positions[' '];
-            _layout = layout;
-        }
+            _positions.Remove(' ');
 
-        public string Press(string sequence)
-        {
-            var stringBuilder = new StringBuilder(sequence.Count(key => key == 'A'));
-            var (x, y) = _positions['A'];
-
-            foreach (char key in sequence)
+            foreach (var from in _positions)
             {
-                _ = key switch
+                foreach (var to in _positions)
                 {
-                    'A' => stringBuilder.Append(_layout[y][x]).Length,  // .Length just so that an int is returned... ugly but better than useless delegate allocations
-                    '<' => x--,
-                    '>' => x++,
-                    '^' => y--,
-                    'v' => y++,
-                    _ => throw new ArgumentException($"Sequence contains an invalid character: {key}"),
-                };
+                    _sequences[(from.Key, to.Key)] = GetSequenceForDelta(from.Value, to.Value);
+                }
             }
-
-            return stringBuilder.ToString();
         }
 
-        public string GetSequenceForTyping(string sequence)
+        private static StringBuilder AppendHorizontal(int dx, StringBuilder stringBuilder)
         {
-            var stringBuilder = new StringBuilder(sequence.Length);
-            var previousPosition = _positions['A'];
+            return stringBuilder.Append((dx < 0) ? '<' : '>', Math.Abs(dx));
+        }
 
-            foreach (var position in sequence.Select(key => _positions[key]))
-            {
-                stringBuilder.Append(GetSequenceForDelta(previousPosition, position));
-                previousPosition = position;
-            }
-
-            return stringBuilder.ToString();
+        private static StringBuilder AppendVertical(int dy, StringBuilder stringBuilder)
+        {
+            return stringBuilder.Append((dy < 0) ? '^' : 'v', Math.Abs(dy));
         }
 
         // ALWAYS TRAVEL FURTHEST (<) FIRST
@@ -142,14 +129,74 @@ public partial record Day21
             return stringBuilder.Append('A').ToString();
         }
 
-        private static StringBuilder AppendHorizontal(int dx, StringBuilder stringBuilder)
+        public string Press(string sequence)
         {
-            return stringBuilder.Append((dx < 0) ? '<' : '>', Math.Abs(dx));
+            var stringBuilder = new StringBuilder(sequence.Count(key => key == 'A'));
+            var (x, y) = _positions['A'];
+
+            foreach (char key in sequence)
+            {
+                _ = key switch
+                {
+                    'A' => stringBuilder.Append(_layout[y][x]).Length,  // .Length just so that an int is returned... ugly but better than useless delegate allocations
+                    '<' => x--,
+                    '>' => x++,
+                    '^' => y--,
+                    'v' => y++,
+                    _ => throw new ArgumentException($"Sequence contains an invalid character: {key}"),
+                };
+            }
+
+            return stringBuilder.ToString();
         }
 
-        private static StringBuilder AppendVertical(int dy, StringBuilder stringBuilder)
+        public string GetSequenceForTyping(string sequence)
         {
-            return stringBuilder.Append((dy < 0) ? '^' : 'v', Math.Abs(dy));
+            var stringBuilder = new StringBuilder(sequence.Length);
+            char previousKey = 'A';
+
+            foreach (var key in sequence)
+            {
+                stringBuilder.Append(_sequences[(previousKey, key)]);
+                previousKey = key;
+            }
+
+            return stringBuilder.ToString();
+        }
+
+        public long GetSequenceLengthForTyping(string sequence, int intermediateRobotCount)
+        {
+            var sequenceCounts = _sequences.Values
+                .Distinct()
+                .ToDictionary(seq => seq, _ => 0L);
+
+            FillSequenceCountsForTyping(sequence, intermediateRobotCount, sequenceCounts);
+
+            return sequenceCounts
+                .Select(sequenceCount => sequenceCount.Key.Length * sequenceCount.Value)
+                .Sum();
+        }
+
+        private void FillSequenceCountsForTyping(
+            string sequence,
+            int remainingRobotCount,
+            Dictionary<string, long> sequenceCounts
+        )
+        {
+            if (remainingRobotCount == 0)
+            {
+                sequenceCounts[sequence]++;
+                return;
+            }
+
+            char previousKey = 'A';
+
+            foreach (char key in sequence)
+            {
+                string parentSequence = _sequences[(previousKey, key)];
+                FillSequenceCountsForTyping(parentSequence, remainingRobotCount - 1, sequenceCounts);
+                previousKey = key;
+            }
         }
 
     }

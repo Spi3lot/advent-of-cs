@@ -31,20 +31,14 @@ public partial record Day21 : AdventDay<Day21>
 
     private static long CalculateComplexity(string code, int directionalRobotCount)
     {
-        string sequence = GetSequenceForTypingCode(code, directionalRobotCount);
-        return sequence.Length * long.Parse(code[..^1]);
+        long sequenceLength = GetSequenceLengthForTypingCode(code, directionalRobotCount);
+        return sequenceLength * long.Parse(code[..^1]);
     }
 
-    private static string GetSequenceForTypingCode(string code, int directionalRobotCount)
+    private static long GetSequenceLengthForTypingCode(string code, int directionalRobotCount)
     {
         string sequence = NumericKeyPad.GetSequenceForTyping(code);
-
-        for (int i = 0; i < directionalRobotCount; i++)
-        {
-            sequence = DirectionalKeyPad.GetSequenceForTyping(sequence);
-        }
-
-        return sequence;
+        return DirectionalKeyPad.GetSequenceLengthForTyping(sequence, directionalRobotCount);
     }
 
 }
