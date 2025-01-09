@@ -19,12 +19,13 @@ public static class DictionaryExtensions
     public static void MergeAll<TKey, TValue>(
         this Dictionary<TKey, TValue> dst,
         Dictionary<TKey, TValue> src,
+        TValue defaultValue,
         Func<TKey, TValue, TValue, TValue> keyMerger
     ) where TKey : notnull
     {
         foreach (var srcPair in src)
         {
-            dst.Merge(srcPair.Key, srcPair.Value, keyMerger);
+            dst.Merge(srcPair.Key, srcPair.Value, defaultValue, keyMerger);
         }
     }
 
@@ -32,11 +33,11 @@ public static class DictionaryExtensions
         this Dictionary<TKey, TValue> dst,
         TKey key,
         TValue value,
+        TValue defaultValue,
         Func<TKey, TValue, TValue, TValue> keyMerger
     ) where TKey : notnull
     {
-        if (!dst.TryGetValue(key, out var dstValue)) dst[key] = value;
-        else dst[key] = keyMerger(key, dstValue, value);
+        dst[key] = keyMerger(key, dst.GetValueOrDefault(key, defaultValue), value);
     }
 
 }

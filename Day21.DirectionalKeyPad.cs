@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace AdventOfCode;
+﻿namespace AdventOfCode;
 
 public partial record Day21
 {
@@ -8,29 +6,28 @@ public partial record Day21
     private sealed class DirectionalKeyPad : KeyPad
     {
 
-        private readonly Dictionary<string, Dictionary<string, long>> _superSequenceDeltaSequenceCounts = [];
+        private readonly Dictionary<string, Dictionary<string, UInt128>> _superSequenceDeltaSequenceCounts = [];
 
         public DirectionalKeyPad() : base([" ^A", "<v>"])
         {
-
-            foreach (string sequence in _sequences.Values)
+            foreach (string sequence in Sequences.Values.Distinct())
             {
-                Console.WriteLine(_superSequenceDeltaSequenceCounts.ContainsKey(sequence));
                 _superSequenceDeltaSequenceCounts[sequence] = CountSuperSequenceDeltaSequences(sequence);
             }
         }
 
-        public override long GetSuperSequenceLength(string sequence, int intermediateRobotCount)
+        public override UInt128 GetNthOrderSuperSequenceLength(string sequence, int intermediateRobotCount)
         {
+            ArgumentOutOfRangeException.ThrowIfNegative(intermediateRobotCount);
             var deltaSequenceCounts = CountSuperSequenceDeltaSequences(sequence);
 
             return CountNthOrderSuperSequenceDeltaSequences(deltaSequenceCounts, intermediateRobotCount)
-                .Select(sequenceCount => sequenceCount.Key.Length * sequenceCount.Value)
-                .Sum();
+                .Select(sequenceCount => (UInt128) sequenceCount.Key.Length * sequenceCount.Value)
+                .Aggregate(UInt128.Zero, (sum, current) => sum + current);
         }
 
-        public Dictionary<string, long> CountNthOrderSuperSequenceDeltaSequences(
-            Dictionary<string, long> deltaSequenceCounts,
+        private Dictionary<string, UInt128> CountNthOrderSuperSequenceDeltaSequences(
+            Dictionary<string, UInt128> deltaSequenceCounts,
             int n
         )
         {
@@ -42,40 +39,20 @@ public partial record Day21
             return deltaSequenceCounts;
         }
 
-        public Dictionary<string, long> CountSuperSequenceDeltaSequences(Dictionary<string, long> sequenceCounts)
+        private Dictionary<string, UInt128> CountSuperSequenceDeltaSequences(Dictionary<string, UInt128> sequenceCounts)
         {
-            var counts = new Dictionary<string, long>();
+            var counts = new Dictionary<string, UInt128>();
 
             foreach (var sequenceCount in sequenceCounts)
             {
                 counts.MergeAll(
                     _superSequenceDeltaSequenceCounts[sequenceCount.Key],
-                    (key, oldValue, newValue) => oldValue + newValue * sequenceCount.Value
+                    UInt128.Zero,
+                    (_, oldValue, newValue) => oldValue + newValue * sequenceCount.Value
                 );
             }
 
             return counts;
-        }
-
-        public string Press(string sequence)
-        {
-            var stringBuilder = new StringBuilder(sequence.Count(key => key == 'A'));
-            var (x, y) = _positions['A'];
-
-            foreach (char key in sequence)
-            {
-                _ = key switch
-                {
-                    'A' => stringBuilder.Append(_layout[y][x]).Length, // .Length just so that an int is returned... ugly but better than useless delegate allocations
-                    '<' => x--,
-                    '>' => x++,
-                    '^' => y--,
-                    'v' => y++,
-                    _ => throw new ArgumentException($"Sequence contains an invalid character: {key}"),
-                };
-            }
-
-            return stringBuilder.ToString();
         }
 
     }

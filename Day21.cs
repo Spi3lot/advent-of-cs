@@ -8,6 +8,7 @@ public partial record Day21 : AdventDay<Day21>
     public Day21()
     {
         _sequences = Input.Trim().Split('\n');
+        _ = KeyPad.Numeric; // Preload static members outside timed area
     }
 
     public override void SolvePart1()
@@ -17,23 +18,25 @@ public partial record Day21 : AdventDay<Day21>
 
     public override void SolvePart2()
     {
-        Console.WriteLine(SumSequenceComplexities(25));
+        // Max for UInt128: 86 (complexity sum of 271892954631843287847658682840772694698 ~= 2.7e38)
+        Console.WriteLine(SumSequenceComplexities(25)); 
     }
 
-    private long SumSequenceComplexities(int directionalRobotCount)
+    private UInt128 SumSequenceComplexities(int directionalRobotCount)
     {
-        return _sequences.Sum(code => CalculateComplexity(code, directionalRobotCount));
+        return checked(_sequences
+            .Select(code => CalculateComplexity(code, directionalRobotCount))
+            .Aggregate(UInt128.Zero, (sum, complexity) => (sum + complexity)));
     }
 
-    private static long CalculateComplexity(string code, int directionalRobotCount)
+    private static UInt128 CalculateComplexity(string code, int directionalRobotCount)
     {
-        long sequenceLength = GetSequenceLengthForTypingCode(code, directionalRobotCount);
-        return sequenceLength * long.Parse(code[..^1]);
+        return UInt128.Parse(code[..^1]) * GetSuperSequenceLength(code, directionalRobotCount);
     }
 
-    private static long GetSequenceLengthForTypingCode(string code, int directionalRobotCount)
+    private static UInt128 GetSuperSequenceLength(string code, int directionalRobotCount)
     {
-        return KeyPad.GetSuperSequenceLength(code, directionalRobotCount);
+        return KeyPad.Numeric.GetNthOrderSuperSequenceLength(code, directionalRobotCount);
     }
 
 }

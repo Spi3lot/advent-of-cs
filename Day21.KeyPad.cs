@@ -7,20 +7,18 @@ public partial record Day21
 
     private abstract class KeyPad
     {
-
-        // Static order matters: Directional before Numeric is important for ctor
-
+        
+        public static readonly NumericKeyPad Numeric = new();
+        
         public static readonly DirectionalKeyPad Directional = new();
 
-        public static readonly NumericKeyPad Numeric = new();
+        protected readonly Dictionary<(char From, char To), string> Sequences = [];
 
-        protected readonly Dictionary<(char From, char To), string> _sequences = [];
+        private readonly Dictionary<char, (int X, int Y)> _positions = [];
 
-        protected readonly Dictionary<char, (int X, int Y)> _positions = [];
+        private readonly (int X, int Y) _gapPosition;
 
-        protected readonly (int X, int Y) _gapPosition;
-
-        protected readonly string[] _layout;
+        private readonly string[] _layout;
 
         protected KeyPad(string[] layout)
         {
@@ -41,7 +39,7 @@ public partial record Day21
             {
                 foreach (var to in _positions)
                 {
-                    _sequences[(from.Key, to.Key)] = GetDeltaSequence(from.Value, to.Value);
+                    Sequences[(from.Key, to.Key)] = GetDeltaSequence(from.Value, to.Value);
                 }
             }
         }
@@ -132,30 +130,51 @@ public partial record Day21
 
             foreach (char key in sequence)
             {
-                stringBuilder.Append(_sequences[(previousKey, key)]);
+                stringBuilder.Append(Sequences[(previousKey, key)]);
                 previousKey = key;
             }
 
             return stringBuilder.ToString();
         }
 
-        public abstract long GetSuperSequenceLength(string sequence, int intermediateRobotCount);
+        public abstract UInt128 GetNthOrderSuperSequenceLength(string sequence, int intermediateRobotCount);
 
-        public Dictionary<string, long> CountSuperSequenceDeltaSequences(string sequence)
+        protected Dictionary<string, UInt128> CountSuperSequenceDeltaSequences(string sequence)
         {
-            var counts = new Dictionary<string, long>();
+            var counts = new Dictionary<string, UInt128>();
             char fromKey = 'A';
 
             foreach (char toKey in sequence)
             {
-                counts.Merge(_sequences[(fromKey, toKey)], 1, Add);
+                counts.Merge(Sequences[(fromKey, toKey)], UInt128.One, UInt128.Zero, Add);
                 fromKey = toKey;
             }
 
             return counts;
         }
+        
+        public string Press(string sequence)
+        {
+            var stringBuilder = new StringBuilder(sequence.Count(key => key == 'A'));
+            var (x, y) = _positions['A'];
 
-        protected static long Add(string key, long oldValue, long newValue) => oldValue + newValue;
+            foreach (char key in sequence)
+            {
+                _ = key switch
+                {
+                    'A' => stringBuilder.Append(_layout[y][x]).Length, // .Length just so that an int is returned... ugly but better than useless delegate allocations
+                    '<' => x--,
+                    '>' => x++,
+                    '^' => y--,
+                    'v' => y++,
+                    _ => throw new ArgumentException($"Sequence contains an invalid character: {key}"),
+                };
+            }
+
+            return stringBuilder.ToString();
+        }
+
+        private static UInt128 Add(string key, UInt128 oldValue, UInt128 newValue) => oldValue + newValue;
 
         private static StringBuilder AppendHorizontal(int dx, StringBuilder stringBuilder)
         {

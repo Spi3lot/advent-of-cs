@@ -3,19 +3,14 @@
 public partial record Day21
 {
 
-    private sealed class NumericKeyPad : KeyPad
+    private sealed class NumericKeyPad() : KeyPad(["789", "456", "123", " 0A"])
     {
-        public NumericKeyPad() : base(["789", "456", "123", " 0A"])
-        {
 
-        }
-        public override long GetSuperSequenceLength(string code, int intermediateRobotCount)
+        public override UInt128 GetNthOrderSuperSequenceLength(string sequence, int intermediateRobotCount)
         {
-            var deltaSequenceCounts = CountSuperSequenceDeltaSequences(code);
-
-            return Directional.CountNthOrderSuperSequenceDeltaSequences(deltaSequenceCounts, intermediateRobotCount - 1)
-                .Select(sequenceCount => sequenceCount.Key.Length * sequenceCount.Value)
-                .Sum();
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(intermediateRobotCount);
+            string superSequence = GetSuperSequence(sequence);
+            return Directional.GetNthOrderSuperSequenceLength(superSequence, intermediateRobotCount - 1);
         }
 
     }
