@@ -8,8 +8,7 @@ public partial record Day13 : AdventDay<Day13>
     {
         long minimumTokenCount = Input.Split("\n\n")
             .Select(ClawMachine.Parse)
-            .Select(clawMachine => clawMachine.CalcMinimumTokenCountForPrize())
-            .Sum();
+            .Sum(clawMachine => clawMachine.CalcMinimumTokenCountForPrize());
 
         Console.WriteLine(minimumTokenCount);
     }
@@ -24,8 +23,7 @@ public partial record Day13 : AdventDay<Day13>
                 clawMachine.Prize.Y += 10_000_000_000_000;
                 return clawMachine;
             })
-            .Select(clawMachine => clawMachine.CalcMinimumTokenCountForPrize())
-            .Sum();
+            .Sum(clawMachine => clawMachine.CalcMinimumTokenCountForPrize());
 
         Console.WriteLine(minimumTokenCount);
     }
