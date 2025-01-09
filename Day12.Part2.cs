@@ -60,12 +60,12 @@ public partial record Day12
     )
     {
         var matches = queue
-            .Select((plot, index) => (Value: plot, Index: index))
-            .Where(plot => plot.Value.Position == position)
+            .Index()
+            .Where(plot => plot.Item.Position == position)
             .ToList();
 
         countPerimeterSide = matches
-            .Select(plot => plot.Value.CountPerimeterSide)
+            .Select(plot => plot.Item.CountPerimeterSide)
             .Aggregate(
                 countPerimeterSide,
                 (resultBools, currentBools) => resultBools.Select(
