@@ -6,7 +6,7 @@ public partial record Day21
     private sealed class NumericKeyPad() : KeyPad(["789", "456", "123", " 0A"])
     {
 
-        public override UInt128 GetNthOrderSuperSequenceLength(string sequence, int intermediateRobotCount)
+        public override Number GetNthOrderSuperSequenceLength(string sequence, int intermediateRobotCount)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(intermediateRobotCount);
             string superSequence = GetSuperSequence(sequence);

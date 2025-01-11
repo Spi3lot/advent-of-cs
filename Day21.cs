@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode;
+﻿global using Number = System.Numerics.BigInteger;
+
+namespace AdventOfCode;
 
 public partial record Day21 : AdventDay<Day21>
 {
@@ -19,22 +21,22 @@ public partial record Day21 : AdventDay<Day21>
     public override void SolvePart2()
     {
         // Max for UInt128: 86 (complexity sum of 271892954631843287847658682840772694698 ~= 2.7e38)
-        Console.WriteLine(SumSequenceComplexities(25)); 
+        Console.WriteLine(SumSequenceComplexities(25));
     }
 
-    private UInt128 SumSequenceComplexities(int directionalRobotCount)
+    private Number SumSequenceComplexities(int directionalRobotCount)
     {
         return checked(_sequences
             .Select(code => CalculateComplexity(code, directionalRobotCount))
-            .Aggregate(UInt128.Zero, (sum, complexity) => (sum + complexity)));
+            .Aggregate(Number.Zero, (sum, complexity) => (sum + complexity)));
     }
 
-    private static UInt128 CalculateComplexity(string code, int directionalRobotCount)
+    private static Number CalculateComplexity(string code, int directionalRobotCount)
     {
-        return UInt128.Parse(code[..^1]) * GetSuperSequenceLength(code, directionalRobotCount);
+        return Number.Parse(code[..^1]) * GetSuperSequenceLength(code, directionalRobotCount);
     }
 
-    private static UInt128 GetSuperSequenceLength(string code, int directionalRobotCount)
+    private static Number GetSuperSequenceLength(string code, int directionalRobotCount)
     {
         return KeyPad.Numeric.GetNthOrderSuperSequenceLength(code, directionalRobotCount);
     }

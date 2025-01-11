@@ -137,16 +137,16 @@ public partial record Day21
             return stringBuilder.ToString();
         }
 
-        public abstract UInt128 GetNthOrderSuperSequenceLength(string sequence, int intermediateRobotCount);
+        public abstract Number GetNthOrderSuperSequenceLength(string sequence, int intermediateRobotCount);
 
-        protected Dictionary<string, UInt128> CountSuperSequenceDeltaSequences(string sequence)
+        protected Dictionary<string, Number> CountSuperSequenceDeltaSequences(string sequence)
         {
-            var counts = new Dictionary<string, UInt128>();
+            var counts = new Dictionary<string, Number>();
             char fromKey = 'A';
 
             foreach (char toKey in sequence)
             {
-                counts.Merge(Sequences[(fromKey, toKey)], UInt128.One, UInt128.Zero, Add);
+                counts.Merge(Sequences[(fromKey, toKey)], Number.One, Number.Zero, Add);
                 fromKey = toKey;
             }
 
@@ -174,7 +174,7 @@ public partial record Day21
             return stringBuilder.ToString();
         }
 
-        private static UInt128 Add(string key, UInt128 oldValue, UInt128 newValue) => oldValue + newValue;
+        private static Number Add(string key, Number oldValue, Number newValue) => oldValue + newValue;
 
         private static StringBuilder AppendHorizontal(int dx, StringBuilder stringBuilder)
         {
