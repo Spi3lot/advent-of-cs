@@ -1,7 +1,7 @@
 ﻿namespace AdventOfCode;
 
-using Buttons = ((long X, long Y, long Cost) A, (long X, long Y, long Cost) B);
 using ButtonPressCount = (long Value, long Numerator, long Denominator);
+using Buttons = ((long X, long Y, long Cost) A, (long X, long Y, long Cost) B);
 
 public partial record Day13
 {
@@ -9,8 +9,8 @@ public partial record Day13
     private sealed class ClawMachine(Buttons buttons, (long, long) prize)
     {
 
-        private static readonly StringSplitOptions StringSplitOptions = StringSplitOptions.RemoveEmptyEntries |
-                                                                        StringSplitOptions.TrimEntries;
+        private const StringSplitOptions SplitOptions = StringSplitOptions.RemoveEmptyEntries |
+                                                              StringSplitOptions.TrimEntries;
 
         private Buttons Buttons { get; } = buttons;
 
@@ -18,10 +18,10 @@ public partial record Day13
 
         public static ClawMachine Parse(string lines)
         {
-            var coordinates = lines.Split('\n', StringSplitOptions)
-                .Select(line => line.Split(": ", StringSplitOptions)[1])
-                .Select(rightHandSide => rightHandSide.Split(", ", StringSplitOptions)
-                    .Select(xy => xy.Split(['+', '='], StringSplitOptions))
+            var coordinates = lines.Split('\n', SplitOptions)
+                .Select(line => line.Split(": ", SplitOptions)[1])
+                .Select(rightHandSide => rightHandSide.Split(", ", SplitOptions)
+                    .Select(xy => xy.Split(['+', '='], SplitOptions))
                     .Select(xy => long.Parse(xy[1]))
                     .ToArray()
                 )
@@ -42,16 +42,16 @@ public partial record Day13
         {
             checked
             {
-                var pressCounts = (A: new ButtonPressCount(), B: new ButtonPressCount());
-                pressCounts.B.Numerator = Buttons.A.Y * Prize.X - Buttons.A.X * Prize.Y;
-                pressCounts.B.Denominator = Buttons.A.Y * Buttons.B.X - Buttons.A.X * Buttons.B.Y;
-                if (pressCounts.B.Numerator % pressCounts.B.Denominator != 0) return 0;
-                pressCounts.B.Value = pressCounts.B.Numerator / pressCounts.B.Denominator;
-                pressCounts.A.Numerator = Prize.X - Buttons.B.X * pressCounts.B.Value;
-                pressCounts.A.Denominator = Buttons.A.X;
-                if (pressCounts.A.Numerator % pressCounts.A.Denominator != 0) return 0;
-                pressCounts.A.Value = pressCounts.A.Numerator / pressCounts.A.Denominator;
-                return Buttons.A.Cost * pressCounts.A.Value + Buttons.B.Cost * pressCounts.B.Value;
+                var (A, B) = (new ButtonPressCount(), new ButtonPressCount());
+                B.Numerator = Buttons.A.Y * Prize.X - Buttons.A.X * Prize.Y;
+                B.Denominator = Buttons.A.Y * Buttons.B.X - Buttons.A.X * Buttons.B.Y;
+                if (B.Numerator % B.Denominator != 0) return 0;
+                B.Value = B.Numerator / B.Denominator;
+                A.Numerator = Prize.X - Buttons.B.X * B.Value;
+                A.Denominator = Buttons.A.X;
+                if (A.Numerator % A.Denominator != 0) return 0;
+                A.Value = A.Numerator / A.Denominator;
+                return Buttons.A.Cost * A.Value + Buttons.B.Cost * B.Value;
             }
         }
 
