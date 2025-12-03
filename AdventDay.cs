@@ -3,7 +3,9 @@
 public abstract record AdventDay<TSelf>(string Input) where TSelf : AdventDay<TSelf>
 {
 
-    protected AdventDay() : this(File.ReadAllText($"../../../inputs/{typeof(TSelf).Name}.txt")) { }
+    protected AdventDay(int year = 2024) : this(File.ReadAllText($"../../../Year{year}/inputs/{typeof(TSelf).Name}.txt"))
+    {
+    }
 
     public abstract void SolvePart1();
 
