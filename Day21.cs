@@ -10,7 +10,7 @@ public partial record Day21 : AdventDay<Day21>
     public Day21()
     {
         _sequences = Input.Trim().Split('\n');
-        _ = KeyPad.Numeric; // Preload static members outside timed area
+        SumSequenceComplexities(1); // Preload static members outside timed section
     }
 
     public override void SolvePart1()
