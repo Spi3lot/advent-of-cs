@@ -1,4 +1,4 @@
-﻿namespace AdventOfCode.Year2024;
+﻿namespace AdventOfCode;
 
 public abstract record AdventDay<TSelf>(string Input) where TSelf : AdventDay<TSelf>
 {

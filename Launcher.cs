@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using AdventOfCode.Year2024;
+using AdventOfCode.Year2025;
 
 namespace AdventOfCode;
 
@@ -8,7 +8,7 @@ public static class Launcher
    
     public static void Main()
     {
-        var day = new Day21();
+        var day = new Day1();
         SolvePartsAndPrintElapsedTimes(day);
     }
 
