@@ -5,45 +5,51 @@ namespace AdventOfCode;
 public static class GridExtensions
 {
 
-    public static void Print<T>(this T[,] grid)
+    extension<T>(T[,] grid)
     {
-        var stringBuilder = new StringBuilder(grid.Length + grid.GetLength(0) * Environment.NewLine.Length);
 
-        for (int j = 0; j < grid.GetLength(0); ++j)
+        public void Print(string columnSeparator = "", string rowSeparator = "\n")
         {
-            for (int i = 0; i < grid.GetLength(1); ++i)
+            var stringBuilder = new StringBuilder(columnSeparator.Length * grid.Length
+                                                  + rowSeparator.Length * grid.GetLength(0));
+            
+            for (int j = 0; j < grid.GetLength(0); ++j)
             {
-                stringBuilder.Append(grid[j, i]);
+                for (int i = 0; i < grid.GetLength(1); ++i)
+                {
+                    stringBuilder.Append(grid[j, i]).Append(columnSeparator);
+                }
+
+                stringBuilder.Append(rowSeparator);
             }
 
-            stringBuilder.AppendLine();
+            Console.Write(stringBuilder);
         }
 
-        Console.Write(stringBuilder);
-    }
-
-    public static void ForEachCell<T>(this T[,] grid, Action<T, int, int> action)
-    {
-        for (int j = 0; j < grid.GetLength(0); ++j)
+        public void ForEachCell(Action<T, int, int> action)
         {
-            for (int i = 0; i < grid.GetLength(1); ++i)
+            for (int j = 0; j < grid.GetLength(0); ++j)
             {
-                action(grid[j, i], i, j);
+                for (int i = 0; i < grid.GetLength(1); ++i)
+                {
+                    action(grid[j, i], i, j);
+                }
             }
         }
-    }
 
-    public static void ForEachCell<T>(this T[,] grid, Action<T> cellAction, Action rowAction)
-    {
-        for (int j = 0; j < grid.GetLength(0); j++)
+        public void ForEachCell(Action<T> cellAction, Action rowAction)
         {
-            for (int i = 0; i < grid.GetLength(1); i++)
+            for (int j = 0; j < grid.GetLength(0); j++)
             {
-                cellAction(grid[j, i]);
-            }
+                for (int i = 0; i < grid.GetLength(1); i++)
+                {
+                    cellAction(grid[j, i]);
+                }
 
-            rowAction();
+                rowAction();
+            }
         }
+
     }
 
     public static T[,] To2D<T>(this T[][] source)
@@ -51,7 +57,8 @@ public static class GridExtensions
         try
         {
             int dim0 = source.Length;
-            int dim1 = source.GroupBy(row => row.Length).Single().Key; // throws InvalidOperationException if source is not rectangular
+            int dim1 = source.GroupBy(row => row.Length).Single()
+                .Key; // throws InvalidOperationException if source is not rectangular
             var result = new T[dim0, dim1];
 
             for (int j = 0; j < dim0; j++)
