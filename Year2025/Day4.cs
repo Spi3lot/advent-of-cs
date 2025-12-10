@@ -5,23 +5,29 @@ public partial record Day4() : AdventDay<Day4>(2025)
 
     public override void SolvePart1()
     {
-        var grid = new PaperGrid(Input);
+        int accessiblePaperRollCount = new PaperGrid(Input)
+            .AccessiblePaperRolls()
+            .Count();
 
-        int code = grid.PaperNeighborCounts
-            .Cast<int>()
-            .Count(neighborCount => neighborCount < 4);
-        
-        grid.PaperNeighborCounts.Print(" ");
-        
-        Console.WriteLine(code);
+        Console.WriteLine(accessiblePaperRollCount);
     }
-    
-    
+
 
     public override void SolvePart2()
     {
-        
-        Console.WriteLine(0);
+        var grid = new PaperGrid(Input);
+        int totalCount = 0;
+        int currentCount;
+
+        do
+        {
+            var accessiblePaperRolls = grid.AccessiblePaperRolls().ToList();
+            accessiblePaperRolls.ForEach(index => grid.InformPaperNeighborsOfAbsence(index.X, index.Y));
+            currentCount = accessiblePaperRolls.Count;
+            totalCount += currentCount;
+        } while (currentCount > 0);
+
+        Console.WriteLine(totalCount);
     }
 
 }

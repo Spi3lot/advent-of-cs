@@ -16,7 +16,7 @@ public partial record Day4
             PaperNeighborCounts = new int[RowCount, ColumnCount];
             _grid = new char[RowCount, ColumnCount];
             FillGrid(lines);
-            RecalculateNeighborCounts();
+            CalculateNeighborCounts();
         }
 
         public int[,] PaperNeighborCounts { get; }
@@ -24,6 +24,22 @@ public partial record Day4
         public int RowCount { get; }
 
         public int ColumnCount { get; }
+
+        public IEnumerable<(int Y, int X)> AccessiblePaperRolls()
+        {
+            return PaperNeighborCounts
+                .Cast<int>()
+                .Index()
+                .Where(neighborCount => neighborCount.Item is >= 0 and < 4)
+                .Select(x => Math.DivRem(x.Index, ColumnCount));
+        }
+
+        public void InformPaperNeighborsOfAbsence(int i, int j)
+        {
+            _grid[j, i] = '.';
+            PaperNeighborCounts[j, i] = -1;
+            InformPaperNeighbors(i, j, Information.Absence);
+        }
 
         private void FillGrid(string[] lines)
         {
@@ -36,7 +52,7 @@ public partial record Day4
             }
         }
 
-        private void RecalculateNeighborCounts()
+        private void CalculateNeighborCounts()
         {
             for (int j = 0; j < RowCount; j++)
             {
@@ -44,29 +60,45 @@ public partial record Day4
                 {
                     if (_grid[j, i] == '@')
                     {
-                        RecalculateNeighborCounts(i, j);
+                        InformPaperNeighbors(i, j, Information.Presence);
+                    }
+                    else
+                    {
+                        PaperNeighborCounts[j, i] = -1;
                     }
                 }
             }
         }
 
-        private void RecalculateNeighborCounts(int i, int j)
+        private void InformPaperNeighbors(int i, int j, Information info)
         {
             for (int y = -1; y <= 1; y++)
             {
+                if (y + j < 0 || y + j >= RowCount)
+                {
+                    continue;
+                }
+
                 for (int x = -1; x <= 1; x++)
                 {
                     if ((x != 0 || y != 0)
                         && x + i >= 0
                         && x + i < ColumnCount
-                        && y + j >= 0
-                        && y + j < RowCount
                         && _grid[j + y, i + x] == '@')
                     {
-                        PaperNeighborCounts[j + y, i + x]++;
+                        PaperNeighborCounts[j + y, i + x] += (int) info;
                     }
                 }
             }
+        }
+
+        private enum Information
+        {
+
+            Absence = -1,
+
+            Presence = 1,
+
         }
 
     }
