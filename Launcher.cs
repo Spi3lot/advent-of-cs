@@ -8,13 +8,17 @@ public static class Launcher
    
     public static void Main()
     {
-        var day = new Day1();
-        SolvePartsAndPrintElapsedTimes(day);
+        SolvePartsAndPrintElapsedTimes<Day5>();
     }
 
-    private static void SolvePartsAndPrintElapsedTimes<T>(AdventDay<T> day) where T : AdventDay<T>
+    private static void SolvePartsAndPrintElapsedTimes<T>() where T : AdventDay<T>, new()
     {
         var stopWatch = Stopwatch.StartNew();
+        var day = new T();
+        stopWatch.Stop();
+        Console.WriteLine($"Init: {stopWatch.Elapsed.TotalSeconds:F7}s\n");
+        
+        stopWatch.Restart();
         day.SolvePart1();
         stopWatch.Stop();
         Console.WriteLine($"Part 1: {stopWatch.Elapsed.TotalSeconds:F7}s\n");
