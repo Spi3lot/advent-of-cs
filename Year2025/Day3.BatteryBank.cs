@@ -29,25 +29,22 @@ public partial record Day3
             return 10 * leftMax + joltage;
         }
 
-        public int FindMaximumJoltageForNBatteriesBroken(int n)
+        public long FindMaximumJoltageForNBatteries(int n)
         {
-            var sortedBatterySet = new SortedSet<int>(_batteries);
-            var batteryList = _batteries.ToList();
+            int startIndex = 0;
+            long maxJoltage = 0;
 
-            if (batteryList.Count < n)
+            for (int i = n - 1; i >= 0; i--)
             {
-                throw new InvalidOperationException($"Not enough batteries ({batteryList.Count} instead of at least {n})");
+                var max = _batteries[startIndex..^i]
+                    .Index()
+                    .MaxBy(x => x.Item);
+
+                startIndex += 1 + max.Index;
+                maxJoltage = 10 * maxJoltage + max.Item;
             }
 
-            while (batteryList.Count >= n + batteryList.Count(battery => battery == sortedBatterySet.Min))
-            {
-                batteryList.RemoveAll(battery => battery == sortedBatterySet.Min);
-                sortedBatterySet.Remove(sortedBatterySet.Min);
-            }
-
-            return batteryList.Count >= n
-                ? batteryList.Take(n).Aggregate((result, next) => 10 * result + next)
-                : throw new InvalidOperationException($"Okay well now we removed too many batteries ({batteryList.Count} instead of at least {n})");
+            return maxJoltage;
         }
 
     }
