@@ -16,7 +16,13 @@ public partial record Day3() : AdventDay<Day3>(2025)
 
     public override void SolvePart2()
     {
-        Console.WriteLine();
+        long totalOutputJoltage = Input.Split('\n')
+            .Where(str => !string.IsNullOrWhiteSpace(str))
+            .Select(str => new BatteryBank(str))
+            .Select(bank => bank.FindMaximumJoltageForNBatteries(12))
+            .Sum();
+
+        Console.WriteLine(totalOutputJoltage);
     }
 
 }
