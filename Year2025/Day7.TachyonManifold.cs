@@ -12,6 +12,10 @@ public partial record Day7
 
         private readonly List<TachyonBeam> _beams = [];
 
+        private readonly Dictionary<(int X, int Y), ulong> _timelineCache = [];
+
+        private ulong _splitCount;
+
         public TachyonManifold(string input)
         {
             _grid = input.Trim().Split('\n');
@@ -24,11 +28,9 @@ public partial record Day7
 
         public int Height { get; }
 
-        public int SplitCount { get; private set; }
-
-        public void Evaluate()
+        public ulong CountSplits()
         {
-            SplitCount = 0;
+            _splitCount = 0;
             _beams.Clear();
             _beams.Add(new TachyonBeam(this) { X = _startPosition.X, Y = _startPosition.Y, });
 
@@ -36,6 +38,33 @@ public partial record Day7
             {
                 _beams.ToList().ForEach(beam => beam.Move());
             }
+
+            return _splitCount;
+        }
+
+        public ulong CountTimelines()
+        {
+            return CountTimelines(_startPosition.X, _startPosition.Y);
+        }
+
+        private ulong CountTimelines(int x, int y)
+        {
+            if (_timelineCache.TryGetValue((x, y), out ulong result))
+            {
+                return result;
+            }
+
+            if (y == Height)
+            {
+                return 1;
+            }
+
+            ulong value = (_grid[y][x] == '^')
+                ? CountTimelines(x - 1, y) + CountTimelines(x + 1, y)
+                : CountTimelines(x, y + 1);
+
+            _timelineCache[(x, y)] = value;
+            return value;
         }
 
         public class TachyonBeam(TachyonManifold manifold)
@@ -64,7 +93,7 @@ public partial record Day7
                 }
 
                 manifold._beams.Add(new TachyonBeam(manifold) { X = X - 1, Y = Y });
-                manifold.SplitCount++;
+                manifold._splitCount++;
                 X++;
                 RemoveDuplicates();
             }
