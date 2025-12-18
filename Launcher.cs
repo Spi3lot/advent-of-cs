@@ -5,7 +5,7 @@ namespace AdventOfCode;
 
 public static class Launcher
 {
-   
+
     public static void Main()
     {
         SolvePartsAndPrintElapsedTimes<Day5>();
@@ -16,8 +16,13 @@ public static class Launcher
         var stopWatch = Stopwatch.StartNew();
         var day = new T();
         stopWatch.Stop();
-        Console.WriteLine($"Init: {stopWatch.Elapsed.TotalSeconds:F7}s\n");
-        
+        Console.WriteLine($"ctor: {stopWatch.Elapsed.TotalSeconds:F7}s\n");
+
+        stopWatch.Restart();
+        day.Setup();
+        stopWatch.Stop();
+        Console.WriteLine($"Setup: {stopWatch.Elapsed.TotalSeconds:F7}s\n");
+
         stopWatch.Restart();
         day.SolvePart1();
         stopWatch.Stop();
