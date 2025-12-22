@@ -7,10 +7,6 @@ public abstract record AdventDay<TSelf>(string Input) where TSelf : AdventDay<TS
     {
     }
 
-    public virtual void Setup()
-    {
-    }
-
     public abstract void SolvePart1();
 
     public abstract void SolvePart2();

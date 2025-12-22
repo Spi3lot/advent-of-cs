@@ -6,7 +6,7 @@ namespace AdventOfCode.Year2025;
 
 using RectangleArea = (Rectangle Rectangle, long Area);
 
-public record Day9() : AdventDay<Day9>(2025)
+public record Day9 : AdventDay<Day9>
 {
 
     private static readonly IComparer<RectangleArea> RectangleAreaComparer =
@@ -14,11 +14,11 @@ public record Day9() : AdventDay<Day9>(2025)
 
     private readonly List<RectangleArea> _rectangleAreas = [];
 
-    private BitArray[]? _borders;
+    private readonly BitArray[] _borders;
 
-    private SectionCollection<bool>[]? _insideShape;
+    private readonly SectionCollection<bool>[] _insideShape;
 
-    public override void Setup()
+    public Day9() : base(2025)
     {
         var tiles = Input.Trim()
             .Split('\n')
@@ -84,7 +84,7 @@ public record Day9() : AdventDay<Day9>(2025)
 
         for (int y = coordinates.Min.Y; y <= coordinates.Max.Y; y++)
         {
-            var sections = _insideShape![y];
+            var sections = _insideShape[y];
 
             if (sections.GetSectionIndex(coordinates.Min.X) != sections.GetSectionIndex(coordinates.Max.X))
             {
@@ -103,14 +103,14 @@ public record Day9() : AdventDay<Day9>(2025)
         {
             for (int y = coordinates.Min.Y; y <= coordinates.Max.Y; y++)
             {
-                _borders![y][firstTile.X] = true;
+                _borders[y][firstTile.X] = true;
             }
         }
         else if (firstTile.Y == secondTile.Y)
         {
             for (int x = coordinates.Min.X; x <= coordinates.Max.X; x++)
             {
-                _borders![firstTile.Y][x] = true;
+                _borders[firstTile.Y][x] = true;
             }
         }
         else
@@ -134,7 +134,7 @@ public record Day9() : AdventDay<Day9>(2025)
     /// .........XX++
     private void MakeShapeFromBorder()
     {
-        foreach (var (row, bits) in _borders!.Index())
+        foreach (var (row, bits) in _borders.Index())
         {
             bool inside = false;
             int sectionSize = 0;
@@ -143,7 +143,7 @@ public record Day9() : AdventDay<Day9>(2025)
             {
                 if ((bits[i] && (i == 0 || !bits[i - 1])) || i == bits.Count - 1)
                 {
-                    _insideShape![row].AddSection(inside, sectionSize);
+                    _insideShape[row].AddSection(inside, sectionSize);
                     inside = !inside;
                     sectionSize = 0;
                 }

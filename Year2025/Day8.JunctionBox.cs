@@ -19,7 +19,7 @@ public partial record Day8
 
         public double DistanceTo(JunctionBox to)
         {
-            double xx = to.X - x;
+            double xx = to.X - X;
             double yy = to.Y - Y;
             double zz = to.Z - Z;
             return Math.Sqrt(xx * xx + yy * yy + zz * zz);
