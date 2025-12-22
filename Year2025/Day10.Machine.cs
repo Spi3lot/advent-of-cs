@@ -8,30 +8,22 @@ public partial record Day10
     public class Machine
     {
 
-        public Lights Lights { get; }
+        public int LightBitmask { get; }
 
-        public Button[] Buttons { get; }
+        public int[] ButtonBitmasks { get; }
 
-        public int[][] Joltages { get; }
+        public int[] Joltages { get; }
 
         public Machine(string input)
         {
             string[] parts = input.Split(' ');
-            Lights = Lights.Parse(parts[0]);
+            LightBitmask = Lights.GetBitmask(parts[0]);
+            ButtonBitmasks = parts[1..^1].Select(Button.GetBitmask).ToArray();
 
-            Buttons = parts[1..]
-                .TakeWhile(x => x is ['(', .., ')'])
-                .Select(Button.Parse)
-                .ToArray();
-
-            Joltages = parts[1..]
-                .SkipWhile(x => x is not ['{', .., '}'])
-                .Select(joltageArray => joltageArray.Trim("{}")
-                    .ToString()
-                    .Split(',')
-                    .Select(int.Parse)
-                    .ToArray()
-                )
+            Joltages = parts[^1].Trim("{}")
+                .ToString()
+                .Split(',')
+                .Select(int.Parse)
                 .ToArray();
         }
 
@@ -43,12 +35,12 @@ public partial record Day10
 
         public IEnumerable<uint> GetValidButtonPressMasks()
         {
-            for (uint mask = 0; mask < (1u << Buttons.Length); mask++)
+            for (uint mask = 0; mask < (1u << ButtonBitmasks.Length); mask++)
             {
-                int lights = Buttons.Where((_, index) => (mask & (1u << index)) != 0)
-                    .Aggregate(0, (result, button) => result ^ button.Bitmask);
+                int lights = ButtonBitmasks.Where((_, index) => (mask & (1u << index)) != 0)
+                    .Aggregate(0, (result, buttonBitmask) => result ^ buttonBitmask);
 
-                if (lights == Lights.Bitmask)
+                if (lights == LightBitmask)
                 {
                     yield return mask;
                 }

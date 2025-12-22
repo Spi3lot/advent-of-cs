@@ -7,12 +7,10 @@ namespace AdventOfCode.Year2025;
 public partial record Day10
 {
 
-    public class Lights
+    public static class Lights
     {
 
-        public int Bitmask { get; private init; }
-
-        public static Lights Parse(string input)
+        public static int GetBitmask(string input)
         {
             string binaryLights = input.Trim("[]")
                 .ToString()
@@ -20,7 +18,7 @@ public partial record Day10
                 .Replace('#', '1');
 
             string reversedBits = new(binaryLights.Reverse().ToArray());
-            return new Lights { Bitmask = int.Parse(reversedBits, NumberStyles.BinaryNumber) };
+            return int.Parse(reversedBits, NumberStyles.BinaryNumber);
         }
         
     }
