@@ -15,12 +15,13 @@ public partial record Day10 : AdventDay<Day10>
 
     public override void SolvePart1()
     {
-        Console.WriteLine(_machines.Sum(machine => machine.DetermineMinimumButtonPresses()));
+        Console.WriteLine(_machines.Sum(machine => machine.DetermineMinimumButtonPresses(false)));
     }
 
 
     public override void SolvePart2()
     {
+        Console.WriteLine(_machines.Sum(machine => machine.DetermineMinimumButtonPresses(true)));
     }
 
 }

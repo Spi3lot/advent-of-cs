@@ -28,25 +28,37 @@ public partial record Day10
         }
 
 
-        public int DetermineMinimumButtonPresses()
+        public int DetermineMinimumButtonPresses(bool joltage)
         {
-            return GetValidButtonPressMasks().Min(BitOperations.PopCount);
+            return (joltage)
+                ? GetValidJoltageButtonPressCounts().Min()
+                : GetValidLightButtonPressMasks().Min(BitOperations.PopCount);
         }
 
-        public IEnumerable<uint> GetValidButtonPressMasks()
+        public IEnumerable<uint> GetValidLightButtonPressMasks()
         {
-            for (uint mask = 0; mask < (1u << ButtonBitmasks.Length); mask++)
+            for (int mask = 0; mask != (1 << ButtonBitmasks.Length); mask++)
             {
-                int lights = ButtonBitmasks.Where((_, index) => (mask & (1u << index)) != 0)
+                int lights = ButtonBitmasks.Where((_, index) => (mask & (1 << index)) != 0)
                     .Aggregate(0, (result, buttonBitmask) => result ^ buttonBitmask);
 
                 if (lights == LightBitmask)
                 {
-                    yield return mask;
+                    yield return (uint) mask;
                 }
             }
         }
 
+        public IEnumerable<int> GetValidJoltageButtonPressCounts()
+        {
+            yield break;
+        }
+
+        public IEnumerable<int> GetMaxJoltageButtonPressCounts()
+        {
+            yield break;
+        }
+        
     }
 
 }
