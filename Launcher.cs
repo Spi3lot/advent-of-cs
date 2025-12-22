@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using AdventOfCode.Year2025;
 
 namespace AdventOfCode;
 
@@ -8,7 +7,7 @@ public static class Launcher
 
     public static void Main()
     {
-        SolvePartsAndPrintElapsedTimes<Day5>();
+        SolvePartsAndPrintElapsedTimes<Year2025.Day9>();
     }
 
     private static void SolvePartsAndPrintElapsedTimes<T>() where T : AdventDay<T>, new()
