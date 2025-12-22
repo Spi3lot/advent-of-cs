@@ -41,8 +41,8 @@ public record Day9() : AdventDay<Day9>(2025)
         }
 
         _rectangleAreas.Reverse();
-        int width = 3 + tiles.Max(tile => tile.X); // TODO: change 3 back to 1
-        int height = 3 + tiles.Max(tile => tile.Y); // TODO: change 3 back to 1
+        int width = 1 + tiles.Max(tile => tile.X);
+        int height = 1 + tiles.Max(tile => tile.Y);
         _borders = new BitArray[height];
         _insideShape = new SectionCollection<bool>[height];
 
@@ -57,52 +57,19 @@ public record Day9() : AdventDay<Day9>(2025)
             ConnectTiles(tiles[i], tiles[(i + 1) % tiles.Length]);
         }
 
-        bool writeToFile = tiles.Length <= 100;
-
-        if (writeToFile)
-        {
-            using var border = File.OpenWrite("border.txt");
-
-            foreach (var bits in _borders)
-            {
-                foreach (bool bit in bits)
-                {
-                    border.WriteByte((byte) ((bit) ? 'X' : '.'));
-                }
-
-                border.WriteByte((byte) '\n');
-            }
-        }
-
         MakeShapeFromBorder();
-
-        if (writeToFile)
-        {
-            using var shape = File.OpenWrite("shape.txt");
-
-            foreach (var sections in _insideShape)
-            {
-                foreach (var section in sections)
-                {
-                    var buffer = Enumerable.Repeat((byte) ((section.Item) ? 'X' : '.'), section.Size);
-                    shape.Write([..buffer]);
-                }
-
-                shape.WriteByte((byte) '\n');
-            }
-        }
     }
 
     public override void SolvePart1()
     {
-        Console.WriteLine(_rectangleAreas[0].Area);
+        Console.WriteLine(_rectangleAreas[0]);
     }
 
 
     public override void SolvePart2()
     {
         var max = _rectangleAreas.First(x => IsInsideShape(x.Rectangle));
-        Console.WriteLine(max.Area);
+        Console.WriteLine(max);
     }
 
     public static long CalculateArea(Rectangle rectangle)
@@ -115,13 +82,10 @@ public record Day9() : AdventDay<Day9>(2025)
     {
         var coordinates = MinMax(rectangle.FirstCorner, rectangle.SecondCorner);
 
-        // Starting at min + 1 and end at max - 1 because tiles themselves are always part of the shape.
-        for (int y = coordinates.Min.Y + 1; y < coordinates.Max.Y; y++)
+        for (int y = coordinates.Min.Y; y <= coordinates.Max.Y; y++)
         {
             var sections = _insideShape![y];
 
-            // Doing the same thing here would not change anything, which is why I did not do it.
-            // Also makes the code more concise and readable.
             if (sections.GetSectionIndex(coordinates.Min.X) != sections.GetSectionIndex(coordinates.Max.X))
             {
                 return false;
@@ -155,9 +119,21 @@ public record Day9() : AdventDay<Day9>(2025)
         }
     }
 
+    /// TODO: fix for horizontal borders
+    ///
+    /// 
+    /// X means the tile was correctly determined to be inside the shape, while
+    /// + means it was wrongfully thought to be the case.
+    /// 
+    /// .......XXXX++
+    /// .......XXXX..
+    /// ..XXXXXXXXX..
+    /// ..XXXXXXXXX..
+    /// ..XXXXXXXXX..
+    /// .........XX..
+    /// .........XX++
     private void MakeShapeFromBorder()
     {
-        // TODO: fix for horizontal borders
         foreach (var (row, bits) in _borders!.Index())
         {
             bool inside = false;
