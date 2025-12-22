@@ -18,11 +18,6 @@ public static class Launcher
         Console.WriteLine($"ctor: {stopWatch.Elapsed.TotalSeconds:F7}s\n");
 
         stopWatch.Restart();
-        day.Setup();
-        stopWatch.Stop();
-        Console.WriteLine($"Setup: {stopWatch.Elapsed.TotalSeconds:F7}s\n");
-
-        stopWatch.Restart();
         day.SolvePart1();
         stopWatch.Stop();
         Console.WriteLine($"Part 1: {stopWatch.Elapsed.TotalSeconds:F7}s\n");

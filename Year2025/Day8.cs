@@ -1,13 +1,13 @@
 ﻿namespace AdventOfCode.Year2025;
 
-public partial record Day8() : AdventDay<Day8>(2025)
+public partial record Day8 : AdventDay<Day8>
 {
 
-    private List<JunctionBox> _boxes = [];
+    private readonly List<JunctionBox> _boxes = [];
 
-    private List<(double Dist, JunctionBox First, JunctionBox Second)> _pairs = [];
+    private readonly List<(double Dist, JunctionBox First, JunctionBox Second)> _pairs = [];
 
-    public override void Setup()
+    public Day8() : base(2025)
     {
         _boxes = Input.Trim()
             .Split('\n')
