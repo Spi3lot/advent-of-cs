@@ -14,8 +14,4 @@
       <PackageReference Include="ILGPU" Version="1.5.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Year2025\inputs\" />
-    </ItemGroup>
-
 </Project>
