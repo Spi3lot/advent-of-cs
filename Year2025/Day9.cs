@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-
 using Tile = (int X, int Y);
 using Rectangle = ((int X, int Y) FirstCorner, (int X, int Y) SecondCorner);
 
@@ -58,53 +57,40 @@ public record Day9() : AdventDay<Day9>(2025)
             ConnectTiles(tiles[i], tiles[(i + 1) % tiles.Length]);
         }
 
-        using var border = File.OpenWrite("border.txt");
+        bool writeToFile = tiles.Length <= 100;
 
-        foreach (var bits in _borders)
+        if (writeToFile)
         {
-            foreach (bool bit in bits)
+            using var border = File.OpenWrite("border.txt");
+
+            foreach (var bits in _borders)
             {
-                border.WriteByte((byte) ((bit) ? 'X' : '.'));
+                foreach (bool bit in bits)
+                {
+                    border.WriteByte((byte) ((bit) ? 'X' : '.'));
+                }
+
+                border.WriteByte((byte) '\n');
             }
-        
-            border.WriteByte((byte) '\n');
-        }
-        
-        // foreach (var sections in _insideShape)
-        // {
-        //     foreach (var section in sections)
-        //     {
-        //         var buffer = Enumerable.Repeat((byte) ((section.Item) ? 'X' : '.'), section.Size);
-        //         border.Write([..buffer]);
-        //     }
-        //
-        //     border.WriteByte((byte) '\n');
-        // }
-
-        ConvertBorderToShape();
-
-        using var shape = File.OpenWrite("shape.txt");
-
-        foreach (var bits in _borders)
-        {
-            foreach (bool bit in bits)
-            {
-                shape.WriteByte((byte) ((bit) ? 'X' : '.'));
-            }
-        
-            shape.WriteByte((byte) '\n');
         }
 
-        // foreach (var sections in _insideShape)
-        // {
-        //     foreach (var section in sections)
-        //     {
-        //         var buffer = Enumerable.Repeat((byte) ((section.Item) ? 'X' : '.'), section.Size);
-        //         border.Write([..buffer]);
-        //     }
-        //
-        //     shape.WriteByte((byte) '\n');
-        // }
+        MakeShapeFromBorder();
+
+        if (writeToFile)
+        {
+            using var shape = File.OpenWrite("shape.txt");
+
+            foreach (var sections in _insideShape)
+            {
+                foreach (var section in sections)
+                {
+                    var buffer = Enumerable.Repeat((byte) ((section.Item) ? 'X' : '.'), section.Size);
+                    shape.Write([..buffer]);
+                }
+
+                shape.WriteByte((byte) '\n');
+            }
+        }
     }
 
     public override void SolvePart1()
@@ -129,14 +115,16 @@ public record Day9() : AdventDay<Day9>(2025)
     {
         var coordinates = MinMax(rectangle.FirstCorner, rectangle.SecondCorner);
 
+        // Starting at min + 1 and end at max - 1 because tiles themselves are always part of the shape.
         for (int y = coordinates.Min.Y + 1; y < coordinates.Max.Y; y++)
         {
-            for (int x = coordinates.Min.X + 1; x < coordinates.Max.X; x++)
+            var sections = _insideShape![y];
+
+            // Doing the same thing here would not change anything, which is why I did not do it.
+            // Also makes the code more concise and readable.
+            if (sections.GetSectionIndex(coordinates.Min.X) != sections.GetSectionIndex(coordinates.Max.X))
             {
-                if (!_insideShape![y][x])
-                {
-                    return false;
-                }
+                return false;
             }
         }
 
@@ -167,30 +155,24 @@ public record Day9() : AdventDay<Day9>(2025)
         }
     }
 
-    private void ConvertBorderToShape()
+    private void MakeShapeFromBorder()
     {
-        // TODO: distingush between 90° left and right turns
-        foreach (var bits in _borders!)
+        // TODO: fix for horizontal borders
+        foreach (var (row, bits) in _borders!.Index())
         {
-            bool passedBorder = false;
             bool inside = false;
+            int sectionSize = 0;
 
             for (int i = 0; i < bits.Count; i++)
             {
-                if (bits[i])
+                if ((bits[i] && (i == 0 || !bits[i - 1])) || i == bits.Count - 1)
                 {
-                    if (!passedBorder)
-                    {
-                        inside = !inside;
-                    }
+                    _insideShape![row].AddSection(inside, sectionSize);
+                    inside = !inside;
+                    sectionSize = 0;
+                }
 
-                    passedBorder = true;
-                }
-                else
-                {
-                    bits[i] = inside;
-                    passedBorder = false;
-                }
+                sectionSize++;
             }
         }
     }

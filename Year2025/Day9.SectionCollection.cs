@@ -8,7 +8,7 @@ public class SectionCollection<T> : IEnumerable<(T Item, int Size)>
     private readonly List<T> _sectionItems = [];
 
     private readonly List<int> _sectionEndIndices = [];
-    
+
     public int SectionCount => _sectionItems.Count;
 
     public void AddSection(T item, int size)
@@ -23,23 +23,26 @@ public class SectionCollection<T> : IEnumerable<(T Item, int Size)>
         _sectionItems.Add(item);
     }
 
-    public T this[int index]
+    public T this[int index] => _sectionItems[GetSectionIndex(index)];
+
+    public int GetSectionIndex(int itemIndex)
     {
-        get
-        {
-            int sectionIndex = _sectionEndIndices.BinarySearch(index);
-            return _sectionItems[(sectionIndex < 0) ? ~sectionIndex : sectionIndex];
-        }
+        int sectionIndex = _sectionEndIndices.BinarySearch(itemIndex);
+        return (sectionIndex < 0) ? ~sectionIndex : sectionIndex;
+    }
+
+    public int GetSectionSize(int sectionIndex)
+    {
+        int currentSectionEndIndex = _sectionEndIndices[sectionIndex];
+        int previousSectionEndIndex = (sectionIndex == 0) ? -1 : _sectionEndIndices[sectionIndex - 1];
+        return currentSectionEndIndex - previousSectionEndIndex;
     }
 
     public IEnumerator<(T Item, int Size)> GetEnumerator()
     {
-        int accumulatedLength = -1;
-        
         for (int i = 0; i < SectionCount; i++)
         {
-            yield return (_sectionItems[i], _sectionEndIndices[i] - accumulatedLength);
-            accumulatedLength += _sectionEndIndices[i];
+            yield return (_sectionItems[i], GetSectionSize(i));
         }
     }
 
