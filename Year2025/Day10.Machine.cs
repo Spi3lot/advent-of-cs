@@ -30,7 +30,7 @@ public partial record Day10
 
         public int DetermineMinimumButtonPressCount(bool joltage)
         {
-            return (joltage)
+            return joltage
                 ? GetValidJoltageButtonPressCounts().Min(Enumerable.Sum)
                 : GetValidLightButtonPressMasks().Min(BitOperations.PopCount);
         }
