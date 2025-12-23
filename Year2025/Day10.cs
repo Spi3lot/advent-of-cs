@@ -15,13 +15,18 @@ public partial record Day10 : AdventDay<Day10>
 
     public override void SolvePart1()
     {
-        Console.WriteLine(_machines.Sum(machine => machine.DetermineMinimumButtonPresses(false)));
+        Console.WriteLine(_machines.Sum(machine => machine.DetermineMinimumButtonPressCount(false)));
     }
 
 
     public override void SolvePart2()
     {
-        Console.WriteLine(_machines.Sum(machine => machine.DetermineMinimumButtonPresses(true)));
+        int sum = _machines.AsParallel()
+            .Select(machine => machine.DetermineMinimumButtonPressCount(true))
+            .LazyForAll((count, index) => Console.WriteLine($"{index}: {count}"))
+            .Sum();
+
+        Console.WriteLine(sum);
     }
 
 }
